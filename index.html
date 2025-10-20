@@ -606,6 +606,15 @@
             animation: spin 12s linear infinite;
         }
         /* 接收按钮动画 - 极简优雅版 */
+        /* 邮件发送图标闪烁动画 - 保持图标不变，只改变显示效果 */
+        @keyframes mail-send-flash {
+            0% { opacity: 1; filter: brightness(1); }
+            25% { opacity: 0.6; filter: brightness(0.8); }
+            50% { opacity: 1; filter: brightness(1.2); }
+            75% { opacity: 0.6; filter: brightness(0.8); }
+            100% { opacity: 1; filter: brightness(1); }
+        }
+        
         /* 刷新按钮旋转动画 - 顺时针旋转 */
         @keyframes spin-clockwise {
             from { transform: rotate(0deg); }
@@ -613,6 +622,11 @@
         }
         
         .spinning {
+            animation: mail-send-flash 1.2s ease-in-out infinite;
+        }
+        
+        /* 刷新图标专用旋转类 */
+        .spinning-rotate {
             animation: spin-clockwise 1s linear infinite;
         }
         
@@ -12917,21 +12931,33 @@
             z-index: 30;
         }
 
-        /* 3. 新增：新返回按钮的毛玻璃样式 */
-        #character-phone-screen #char-phone-exit-btn {
-            backdrop-filter: blur(15px) saturate(180%);
-            -webkit-backdrop-filter: blur(15px) saturate(180%);
-            background-color: rgba(128, 128, 128, 0.3);
+        /* 3. 新增：更多菜单按钮的毛玻璃样式 */
+        #character-phone-screen #char-phone-menu-btn {
             border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
             transition: background-color 0.2s, transform 0.2s;
         }
-        #character-phone-screen #char-phone-exit-btn:hover {
-            transform: translate(-50%, 0) scale(1.1);
-            background-color: rgba(128, 128, 128, 0.5);
+        #character-phone-screen #char-phone-menu-btn:hover {
+            transform: scale(1.1);
+            background-color: rgba(128, 128, 128, 0.5) !important;
         }
-        #character-phone-screen #char-phone-exit-btn:active {
-            transform: translate(-50%, 0) scale(0.95);
+        #character-phone-screen #char-phone-menu-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* 菜单选项容器动画 */
+        #character-phone-screen #char-phone-menu-options {
+            animation: menuFadeIn 0.2s ease-out;
+        }
+        @keyframes menuFadeIn {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
         }
 
         #character-phone-screen .widget-container {
@@ -12978,6 +13004,7 @@
             font-weight: 600;
             font-size: 1rem;
             text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            color: white;
         }
 
         #character-phone-screen .widget-location {
@@ -12986,10 +13013,19 @@
             display: flex;
             align-items: center;
             margin-top: 0.25rem;
+            color: white;
         }
 
         #character-phone-screen .widget-location span {
             margin-left: 0.25rem;
+        }
+
+        /* 日间模式的文字颜色 */
+        #character-phone-screen.light-theme .widget-name,
+        #character-phone-screen.light-theme .widget-location,
+        #character-phone-screen.light-theme .widget-location i {
+            color: #1f2937 !important;
+            text-shadow: 0 1px 3px rgba(255,255,255,0.5);
         }
 
         #character-phone-screen #char-phone-message-box {
@@ -13039,6 +13075,12 @@
             color: white;
             font-size: 12px;
             opacity: 0.9;
+        }
+
+        /* 日间模式的备忘录文字颜色 */
+        #character-phone-screen.light-theme .memo-widget .memo-text,
+        #character-phone-screen.light-theme .memo-widget .memo-icon {
+            color: #1f2937 !important;
         }
 
         /* ======================================= */
@@ -13849,12 +13891,25 @@
         }
 
         /* 返回按钮白天模式 */
-        #character-phone-screen.light-theme #char-phone-exit-btn {
+        /* 浅色主题的菜单按钮样式 */
+        #character-phone-screen.light-theme #char-phone-menu-btn {
             background-color: rgba(255, 255, 255, 0.4);
         }
 
-        #character-phone-screen.light-theme #char-phone-exit-btn i {
+        #character-phone-screen.light-theme #char-phone-menu-btn i {
             color: #000000;
+        }
+
+        #character-phone-screen.light-theme #char-phone-menu-options {
+            background-color: rgba(255, 255, 255, 0.4);
+        }
+
+        #character-phone-screen.light-theme #char-phone-menu-options button {
+            color: #000000;
+        }
+
+        #character-phone-screen.light-theme #char-phone-menu-options button:hover {
+            background-color: rgba(0, 0, 0, 0.1);
         }
 
         /* ======================================= */
@@ -13886,7 +13941,7 @@
     <input type="file" id="import-data-input" class="hidden" accept=".json">
     <input type="file" id="group-user-avatar-input" class="hidden" accept="image/*">
     <input type="file" id="image-upload-input" class="hidden" accept="image/*">
-    <input type="file" id="sticker-upload-input" class="hidden" accept="image/*">
+    <input type="file" id="sticker-upload-input" class="hidden" accept="image/*" multiple>
     <input type="file" id="user-video-image-input" class="hidden" accept="image/*">
     <input type="file" id="my-video-image-input" class="hidden" accept="image/*">
     <input type="file" id="group-chat-bg-input" class="hidden" accept="image/*">
@@ -14145,19 +14200,16 @@
                     </div>
 
                     <div class="sticker-modal-body">
-                        <div class="sticker-input-group">
-                            <label class="sticker-label">表情关键词</label>
-                            <input type="text" id="sticker-keywords-input" class="sticker-input" placeholder="开心,猫,可爱">
-                        </div>
-
                         <button id="upload-sticker-local-btn" class="sticker-upload-btn">
-                            <i class="ri-upload-cloud-2-line mr-2"></i>本地上传
+                            <i class="ri-upload-cloud-2-line mr-2"></i>本地上传 (支持多选)
                         </button>
+                        
+                        <p class="text-xs text-gray-400 text-center my-2">提示：本地上传/粘贴图片将自动识别关键词。</p>
 
                         <div class="sticker-input-group">
-                            <label class="sticker-label">或粘贴图片链接</label>
+                            <label class="sticker-label">粘贴内容 (图片 / URL / 关键词:URL列表)</label>
                             <div class="sticker-url-group">
-                                <input type="text" id="sticker-url-input" class="sticker-input" placeholder="https://...">
+                                <textarea id="sticker-url-input" class="sticker-input" placeholder="可粘贴以下任一内容：&#10;1. 图片文件 (Ctrl+V)&#10;2. 关键词: URL 列表 (一行一个)&#10;3. 纯 URL 列表 (一行一个)" rows="4"></textarea>
                                 <button id="send-sticker-url-btn" class="sticker-add-btn">添加</button>
                             </div>
                         </div>
@@ -15975,9 +16027,24 @@
             <div id="character-phone-screen" class="app-screen-view flex-col hidden bg-black">
                 <div id="character-phone-display-content" class="w-full h-full flex flex-col relative overflow-hidden rounded-[2.5rem]">
 
-                    <button id="char-phone-exit-btn" class="absolute top-4 left-1/2 -translate-x-1/2 z-50 w-10 h-10 rounded-full flex items-center justify-center" title="返回角色列表">
-                        <i class="ri-arrow-up-s-line text-2xl text-white"></i>
+                    <!-- 更多菜单按钮 -->
+                    <div class="absolute top-4 left-1/2 -translate-x-1/2 z-50">
+                        <button id="char-phone-menu-btn" class="w-10 h-10 rounded-full flex items-center justify-center" title="更多选项" style="backdrop-filter: blur(15px) saturate(180%); -webkit-backdrop-filter: blur(15px) saturate(180%); background-color: rgba(128, 128, 128, 0.3); transition: all 0.2s;">
+                            <i class="ri-arrow-down-s-line text-2xl text-white"></i>
                     </button>
+                        
+                        <!-- 菜单选项（默认隐藏） -->
+                        <div id="char-phone-menu-options" class="absolute top-12 left-1/2 -translate-x-1/2 hidden flex-col gap-2" style="backdrop-filter: blur(15px) saturate(180%); -webkit-backdrop-filter: blur(15px) saturate(180%); background-color: rgba(128, 128, 128, 0.3); border-radius: 12px; padding: 8px; border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);">
+                            <button id="char-phone-exit-btn" class="w-32 h-10 rounded-lg flex items-center justify-center gap-2 hover:bg-white/20 transition-all" title="返回角色列表">
+                                <i class="ri-arrow-left-line text-lg text-white"></i>
+                                <span class="text-white text-sm">返回</span>
+                            </button>
+                            <button id="char-phone-refresh-btn" class="w-32 h-10 rounded-lg flex items-center justify-center gap-2 hover:bg-white/20 transition-all" title="刷新定位和备忘录">
+                                <i class="ri-refresh-line text-lg text-white"></i>
+                                <span class="text-white text-sm">刷新</span>
+                            </button>
+                        </div>
+                    </div>
 
                     <div id="char-phone-wallpaper" class="absolute inset-0 z-0" style="background-image: url('https://images.unsplash.com/photo-1505909182942-e2f09aee3e89?q=80&w=2147&auto=format&fit=crop'); background-size: cover; background-position: center; filter: grayscale(100%);"></div>
 
@@ -16105,7 +16172,9 @@
                 <div class="app-header">
                     <button id="char-phone-chat-back-btn" class="app-nav-btn"><i class="ri-arrow-left-s-line"></i></button>
                     <h2 id="char-phone-chat-title" class="app-title">联系人名称</h2>
-                    <div class="w-10"></div> </div>
+                    
+                    <button id="char-phone-chat-refresh-btn" class="app-nav-btn"><i class="ri-refresh-line"></i></button>
+                </div>
                 <div id="char-phone-chat-content-area" class="app-content-list p-3 space-y-3">
                     </div>
             </div>
@@ -17830,7 +17899,8 @@
         let currentMailCharacterId = null; // 【【新增】】用于记录当前正在查看哪个角色的信箱
         let currentViewingPhoneCharId = null; // 【新增】用于记录当前正在查看哪个角色的手机
         let currentLetterId = null; // 【【新增】】用于记录当前正在查看的信件ID
-        let userStickers = []; 
+        let userStickers = [];
+        
         let userAvatars = {};
         let chatBackgrounds = {};
         let chatBubbleColors = {};
@@ -18171,7 +18241,9 @@ function getChatBackgroundElement() {
 
         // 加载指定角色的指定 App 数据
         function loadCharacterAppData(characterId, appName) {
-            return characterPhoneData[characterId]?.[appName] || []; // 返回数组或空数组
+            // 【【【修复：根据不同App返回不同的默认值】】】
+            const defaultValue = (appName === 'WeChat') ? null : [];
+            return characterPhoneData[characterId]?.[appName] || defaultValue;
         }
 
         // 保存指定角色的指定 App 数据
@@ -18179,8 +18251,12 @@ function getChatBackgroundElement() {
             if (!characterPhoneData[characterId]) {
                 characterPhoneData[characterId] = {};
             }
-            // 确保保存的是数组
-            characterPhoneData[characterId][appName] = Array.isArray(data) ? data : [];
+            // 【【【修复：微信数据是对象，不强制转换为数组】】】
+            if (appName === 'WeChat') {
+                characterPhoneData[characterId][appName] = data; // 微信数据保存为对象
+            } else {
+                characterPhoneData[characterId][appName] = Array.isArray(data) ? data : []; // 其他App确保是数组
+            }
             saveData('characterPhoneData', characterPhoneData);
         }
 
@@ -18355,7 +18431,7 @@ function getChatBackgroundElement() {
             let systemPrompt = `
 身份：你现在就是角色【${character.name}】(${character.persona})。
 任务：模拟你手机里的【${appNameMapping[appName] || appName}】App 中的内容。内容必须极度符合你的角色设定、与【我 (${userName})】的关系(${character.myPersona || '未知'})、以及你近期的活动和心境（参考[上下文信息]）。内容要真实、私密，可以大胆露骨。
-输出格式：你的输出必须是且只能是一个 JSON 数组，数组中包含 ${appName === 'Contacts' ? '5-7' : '3-5'} 个对象。每个对象的具体结构根据 App 类型决定（见下文）。不要包含任何其他文字或解释。
+输出格式：你的输出必须是且只能是一个 JSON 数组，数组中包含 5-10 个对象。每个对象的具体结构根据 App 类型决定（见下文）。不要包含任何其他文字或解释。
 上下文信息 (你的记忆和近期活动)：
 [当前时间]: ${new Date().toLocaleString()}
 [世界书设定]: ${context.worldBookContext || '无'}
@@ -18393,7 +18469,7 @@ function getChatBackgroundElement() {
                     break;
                 case 'Contacts':
                     systemPrompt += `
-[{"id": "contact_1", "name": "联系人名字", "relation": "与你的关系(不要使用电话号码)", "relationDetail": "对这段关系的详细描述，80-150字，客观但有趣地描述你们的关系、相识经过、相处模式、对方性格特点等"}... (包含 '我' 和其他 4-6 个联系人)]`;
+[{"id": "contact_1", "name": "联系人名字", "relation": "与你的关系(不要使用电话号码)", "relationDetail": "对这段关系的详细描述，80-150字，客观但有趣地描述你们的关系、相识经过、相处模式、对方性格特点等"}... (包含 '我' 和其他 4-9 个联系人)]`;
                     break;
                 case 'CallLog':
                     systemPrompt += `
@@ -18944,7 +19020,7 @@ function getChatBackgroundElement() {
             const refreshIcon = refreshBtn.querySelector('i');
 
             // 开始旋转动画
-            if (refreshIcon) refreshIcon.classList.add('spinning');
+            if (refreshIcon) refreshIcon.classList.add('spinning-rotate');
             
             listContainer.innerHTML = '<p class="text-center text-gray-500 p-4">正在加载...</p>';
 
@@ -18954,8 +19030,27 @@ function getChatBackgroundElement() {
                 const context = gatherAIContext(characterId);
                 const systemPrompt = `
 身份：你现在就是角色【${character.name}】(${character.persona})。
-任务：模拟你手机里一个名为【不要点开】的私密App。这里可能是你发现我在看你手机后想对我说的话，也可能是你近期的一个不为人知的秘密或想法。内容要符合你的性格和近期心境。
-输出格式：直接输出你想写下的那段文字 (100-200字)，不要包含任何 JSON 或其他标记。`;
+任务：模拟你手机里一个名为【不要点开】的私密App。这是你最私密的空间，可能包含：
+- 发现我在偷看你手机后想对我说的话
+- 近期不为人知的秘密或想法
+- 对"我"的情欲幻想、性幻想（可以大胆露骨）
+- 禁忌的欲望、不敢实现的渴望
+- 占有欲、控制欲、嫉妒心理
+- 暗恋的煎熬、暧昧的纠结
+- 压抑的情绪、脆弱的真实自我
+- 对周围人的真实评价（尤其是对"我"）
+
+选择最符合你当前性格、和我的关系近况、心境和处境的其中1-3条内容进行创作。要真实、私密、有冲击力。
+
+【文风指引】根据你的性格和内容选择合适的表达方式：
+- **克制美学**（细腻、优雅、意境深）：像渡边淳一般用诗意笔触写情欲，"他的手指划过我的肌肤，像是在抚摸珍贵的瓷器，小心翼翼，又带着难以抑制的渴望..."
+- **大胆直白**（露骨、直接、张力强）：像阿娜伊斯·宁般不加掩饰，"我想要他。想要得快要疯了。想象着他把我压在墙上，撕开我的衣服，用那双总是冷漠的眼睛看着我失控的模样..."
+- **病态占有欲**（扭曲、极端、禁忌感）：像安妮·赖斯般哥特式表达，"他应该只属于我，只能看着我，只能想着我。有时候我会幻想，如果把他锁起来，只有我能触碰他，该有多好..."
+- **脆弱自白**（真实、羞耻、自我厌恶）：像劳伦斯般灵肉交织，"我知道这样很下贱。可是每次他靠近，我的身体就会不由自主地发烫。我想要更多，想要他的全部..."
+- **暗示留白**（隐晦、暧昧、意犹未尽）：像Priest般用隐喻和张力，"他的呼吸烫在我耳后，像是要把理智一并烧尽。我闭上眼，任由那股热度蔓延全身..."
+
+书写内容要富有文学色彩和情绪张力，可参考书信体文学作家风格，文字优美，富有画面感，直白但细腻。如果是情欲/幻想类内容，可以直白露骨地表达身体欲望和性幻想，描写要有画面感，不需要遮掩。
+输出格式：直接输出你想写下的那段文字 (300-500字)，不要包含任何 JSON 或其他标记。`;
 
                 const aiResponse = await callAI(systemPrompt, "生成【不要点开】App的内容。");
                 if (aiResponse) {
@@ -18970,7 +19065,7 @@ function getChatBackgroundElement() {
                 }
             } finally {
                 // 停止旋转动画
-                if (refreshIcon) refreshIcon.classList.remove('spinning');
+                if (refreshIcon) refreshIcon.classList.remove('spinning-rotate');
             }
         }
 
@@ -19059,12 +19154,25 @@ function getChatBackgroundElement() {
             refreshBtn.onclick = () => refreshWeChatData(characterId);
             refreshBtn.style.display = 'inline-flex';
             
+            // 尝试从本地加载已保存的数据
+            const savedData = loadCharacterAppData(characterId, 'WeChat');
+            
+            if (savedData && savedData.contacts && savedData.contacts.length > 0) {
+                // 如果有数据，直接渲染
+                console.log("加载已保存的iMessage联系人...");
+                currentWeChatData = savedData; // 确保全局变量被设置
+                renderWeChatContacts(characterId);
+            } else {
+                // 如果没数据，才显示提示
+                console.log("未找到iMessage数据，提示用户刷新。");
             // 根据主题选择文字颜色
             const phoneScreen = document.getElementById('character-phone-screen');
             const isLightTheme = phoneScreen?.classList.contains('light-theme');
             const textColor = isLightTheme ? 'text-gray-900' : 'text-white';
             
-            listContainer.innerHTML = `<p class="text-center ${textColor} p-4">点击右上角刷新按钮查看联系人</p>`;
+                listContainer.innerHTML = `<p class="text-center ${textColor} p-4">点击右上角刷新按钮生成联系人</p>`;
+            }
+            
             detailView.style.display = 'flex';
 
             // 绑定聊天详情页的返回按钮
@@ -19086,7 +19194,7 @@ function getChatBackgroundElement() {
             const refreshIcon = refreshBtn.querySelector('i');
 
             // 开始旋转动画
-            if (refreshIcon) refreshIcon.classList.add('spinning');
+            if (refreshIcon) refreshIcon.classList.add('spinning-rotate');
             
             listContainer.innerHTML = '<p class="text-center text-gray-500 p-4">正在重新生成微信数据...</p>';
             
@@ -19095,7 +19203,7 @@ function getChatBackgroundElement() {
                 renderWeChatContacts(characterId);
             } finally {
                 // 停止旋转动画
-                if (refreshIcon) refreshIcon.classList.remove('spinning');
+                if (refreshIcon) refreshIcon.classList.remove('spinning-rotate');
             }
         }
 
@@ -19117,7 +19225,7 @@ function getChatBackgroundElement() {
 身份：你现在就是角色【${character.name}】(${character.persona})。
 任务：模拟你手机微信里的联系人列表和与部分联系人的近期聊天记录。
 要求：
-- 联系人: 生成 3-5 个你可能认识或联系的人 (必须包含【${userName}】)。联系人要符合你的社交圈和[上下文信息]。
+- 联系人: 生成 5-10 个你可能认识或联系的人 (必须包含【${userName}】)。联系人要符合你的社交圈和[上下文信息]。
 - 聊天记录: 为每个联系人（包括【${userName}】）生成 5-10 条符合你们关系的、非常简短且口语化的近期聊天记录（有来有回）。聊天内容要能体现你们的关系、你的性格以及近期的事件（参考[上下文信息]）。
 JSON 输出: 严格按以下 JSON 格式输出，不要包含任何其他文字。
 
@@ -19245,7 +19353,162 @@ JSON 格式：
             // 切换视图
             detailView.style.display = 'none';
             chatDetailView.style.display = 'flex';
+
+            // 【【【新增代码：为新添加的聊天刷新按钮绑定事件】】】
+            const chatRefreshBtn = document.getElementById('char-phone-chat-refresh-btn');
+            if (chatRefreshBtn) {
+                // 解决重复绑定的问题
+                const newChatRefreshBtn = chatRefreshBtn.cloneNode(true);
+                chatRefreshBtn.parentNode.replaceChild(newChatRefreshBtn, chatRefreshBtn);
+
+                newChatRefreshBtn.addEventListener('click', () => {
+                    console.log(`刷新与 ${contactId} 的聊天`);
+                    // 添加旋转动画
+                    const icon = newChatRefreshBtn.querySelector('i');
+                    if (icon && !icon.classList.contains('rotating')) {
+                        icon.style.animation = 'refreshRotate 1s linear infinite';
+                    }
+                    generateNewChatMessage(characterId, contactId);
+                });
+            }
+            // 【【【新增代码结束】】】
         }
+
+        // 【【【新增函数：生成新的聊天消息（刷新按钮调用）】】】
+        async function generateNewChatMessage(characterId, contactId) {
+            console.log(`开始为角色 ${characterId} 和联系人 ${contactId} 生成新消息...`);
+            
+            const character = characters.find(c => c.id === characterId);
+            if (!character) {
+                showMessageBox('角色不存在');
+                return;
+            }
+
+            const contact = currentWeChatData.contacts.find(c => c.id === contactId);
+            if (!contact) {
+                showMessageBox('联系人不存在');
+                return;
+            }
+
+            // 获取现有聊天记录
+            const chatHistory = currentWeChatData.chats[contactId] || [];
+            const context = gatherAIContext(characterId);
+            const userName = loadData('perch_username') || '用户';
+
+            // 构建对话历史文本
+            const historyText = chatHistory.slice(-10).map(msg => {
+                const senderName = msg.sender === 'ai' ? character.name : (contactId === 'user' ? userName : contact.name);
+                return `${senderName}: ${msg.content}`;
+            }).join('\n');
+
+            const systemPrompt = `
+身份：你是一个聊天记录生成器。现在需要生成角色【${character.name}】和【${contact.name}】之间接下来的5-10条对话。
+任务：模拟这两个人的自然对话，生成他们之间一段完整的互动场景。
+
+角色信息：
+- 【${character.name}】性格：${character.persona}
+- 【${contact.name}】是角色的联系人
+
+要求：
+- 生成5-10条消息，让双方轮流对话，形成流畅的聊天场景
+- 消息要简短、口语化，符合微信聊天风格
+- 可以包含多个话题转折，让对话更生动有趣
+- 内容要符合双方的性格和关系，自然流畅
+- sender为"ai"表示角色${character.name}发的，sender为"other"表示联系人${contact.name}发的
+- 输出纯JSON格式，不要包含任何其他文字
+
+JSON 格式示例：
+\`\`\`json
+{
+  "messages": [
+    {"sender": "other", "content": "联系人说的话"},
+    {"sender": "ai", "content": "角色回复"},
+    {"sender": "other", "content": "联系人再说"},
+    {"sender": "ai", "content": "角色再回复"},
+    {"sender": "other", "content": "继续对话..."}
+  ]
+}
+\`\`\`
+
+上下文信息：
+[当前时间]: ${new Date().toLocaleString()}
+[最近的聊天记录]:
+${historyText || '（还没有聊天记录，请主动开启话题）'}
+
+[角色记忆]: ${context.memoryContext || '无'}
+[世界设定]: ${context.worldBookContext || '无'}
+`;
+
+            try {
+                // 显示加载提示
+                const chatDetailContent = document.getElementById('char-phone-chat-content-area');
+                const loadingDiv = document.createElement('div');
+                loadingDiv.className = 'text-center text-gray-500 text-xs py-2';
+                loadingDiv.textContent = '正在生成消息...';
+                loadingDiv.id = 'chat-loading-indicator';
+                chatDetailContent.appendChild(loadingDiv);
+
+                const aiResponse = await callAI(systemPrompt, `生成与${contact.name}的对话`);
+                
+                // 移除加载提示和停止旋转动画
+                const loadingIndicator = document.getElementById('chat-loading-indicator');
+                if (loadingIndicator) loadingIndicator.remove();
+                
+                const refreshBtn = document.getElementById('char-phone-chat-refresh-btn');
+                if (refreshBtn) {
+                    const icon = refreshBtn.querySelector('i');
+                    if (icon) icon.style.animation = '';
+                }
+
+                if (aiResponse) {
+                    const jsonMatch = aiResponse.match(/```json([\s\S]*?)```/);
+                    if (jsonMatch) {
+                        const result = JSON.parse(jsonMatch[1]);
+                        
+                        if (result.messages && Array.isArray(result.messages)) {
+                            // 添加新消息到聊天记录
+                            result.messages.forEach(msg => {
+                                if (!currentWeChatData.chats[contactId]) {
+                                    currentWeChatData.chats[contactId] = [];
+                                }
+                                currentWeChatData.chats[contactId].push(msg);
+                                
+                                // 立即在界面上显示（sender为"ai"是角色，"other"是联系人）
+                                const bubble = document.createElement('div');
+                                bubble.className = `chat-bubble ${msg.sender === 'ai' ? 'sender' : 'receiver'}`;
+                                bubble.textContent = msg.content;
+                                chatDetailContent.appendChild(bubble);
+                            });
+
+                            // 保存更新后的数据
+                            saveCharacterAppData(characterId, 'WeChat', currentWeChatData);
+                            console.log('新消息已生成并保存:', result.messages);
+
+                            // 滚动到底部
+                            setTimeout(() => chatDetailContent.scrollTop = chatDetailContent.scrollHeight, 50);
+                        }
+                    } else {
+                        throw new Error("AI 返回的不是有效的 JSON 格式");
+                    }
+                } else {
+                    throw new Error("AI 未返回任何内容");
+                }
+            } catch (error) {
+                console.error("生成新消息失败:", error);
+                showMessageBox(`生成消息失败: ${error.message}`);
+                
+                // 移除加载提示和停止旋转动画
+                const loadingIndicator = document.getElementById('chat-loading-indicator');
+                if (loadingIndicator) loadingIndicator.remove();
+                
+                const refreshBtn = document.getElementById('char-phone-chat-refresh-btn');
+                if (refreshBtn) {
+                    const icon = refreshBtn.querySelector('i');
+                    if (icon) icon.style.animation = '';
+                }
+            }
+        }
+        // 【【【新增函数结束】】】
 
         // ================== 【心跳设置功能】 ==================
         
@@ -23393,6 +23656,12 @@ if (type === 'image') {
                     })
                     .join('\n');
                 const sharedAssetsContext = sharedAssetsContent.trim() ? sharedAssetsContent.trim() : "无";
+                
+                // 🔧 新增：编译用户表情包库的关键词列表
+                const userStickersContext = userStickers && userStickers.length > 0
+                    ? userStickers.map(s => `- ${s.keywords.join('、')}`).join('\n')
+                    : "无";
+                console.log(`📋 用户表情包库关键词列表 (共 ${userStickers.length} 个): \n${userStickersContext}`);
                 // V23.0 新增：获取并格式化当前时间
                 const currentTimeString = new Date().toLocaleString('zh-CN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 
@@ -23556,14 +23825,15 @@ ${formattingInstruction}
 除了发送文字消息，你现在必须根据对话内容，创造性地使用【HTML模块】和【表情包】来丰富表达。
 
 ## 1. 使用逻辑 (优先级)
-当你想使用某个素材时（比如表达"开心"）：
+当你想使用表情包素材时（比如表达"开心"），按照以下优先级顺序：
 1.  **首先**，检查你的【角色专属素材库】。如果里面有"开心"的关键词，你**必须**使用它。
-2.  **如果专属库里没有**，再去检查【世界通用素材库】。如果找到了，就使用通用的。
-3.  如果两边都找不到，则不使用素材。
+2.  **如果专属库里没有**，再去检查【用户表情包库】。查看可用关键词列表，选择最匹配当前情绪的关键词，使用 \`[STICKER: 关键词]\` 发送。
+3.  **如果用户表情包库也没有**，最后检查【世界通用素材库】。如果找到了，就使用通用的。
+4.  如果三个库都找不到，则不使用表情包素材。
 
 ## 2. 使用方法
 - **HTML模块**: 如果素材内容是HTML代码，直接将【完整的HTML代码】作为一个【不可分割的整体】，作为你的一条回复（用 "|||" 与其他文字对话内容分隔）。绝对禁止分割HTML代码本身。
-- **表情包**: 如果素材内容是一个图片链接，使用 \`[STICKER: 关键词]\` 的格式来请求发送。程序会自动为你替换成链接。
+- **表情包**: 你**必须**使用 \`[STICKER: 关键词]\` 格式来发送表情（例如 \`[STICKER: 开心]\`、\`[STICKER: 害羞]\`）。请从【用户表情包库】中选择合适的关键词。**禁止**使用不带关键词的 \`[STICKER]\` 格式。
 - **发送语音**: 当你想要表达亲密、惊讶或有趣的语气时，可以将回复包装成语音格式：\`[VOICE: 你好呀！今天过得怎么样？]\`
 - **红包/转账 (最高优先级指令)**: 当涉及发送红包或转账时，你 **必须** 使用指令格式 \`[REDPACKET: amount=金额, message=留言]\` 或 \`[TRANSFER: amount=金额, message=留言]\`。**绝对禁止** 为红包或转账生成任何自定义的HTML模块。
 
@@ -23610,6 +23880,11 @@ ${exclusiveAssetsContext}
 ### 世界通用素材库 (备用)
 ${sharedAssetsContent}
 ---
+### 用户表情包库 (中等优先级)
+**说明**: 这是用户上传的表情包素材库。当你想发送表情时，可以使用 \`[STICKER: 关键词]\` 来发送对应情绪的表情。
+**可用关键词**:
+${userStickersContext}
+---
 ### 模块/小剧场风格参考
 ${moduleStyleContext || "无"}
 ---
@@ -23643,7 +23918,179 @@ ${moduleStyleContext || "无"}
                 let headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiSettings.key}` };
 
                 if (isGoogleApi) {
-                    // Google API specific logic
+                    // 【【Google Gemini API 专用逻辑】】
+                    finalApiUrl = `${apiSettings.url.replace(/\/+$/, '')}/${apiSettings.model}:generateContent?key=${apiSettings.key}`;
+                    headers = { 'Content-Type': 'application/json' };
+                    
+                    // Gemini API 使用 contents 数组，每个元素包含 role 和 parts
+                    const contents = [];
+                    
+                    // 异步处理聊天记录，转换为 Gemini 格式
+                    for (const msg of historyForApi) {
+                        let role = msg.sender === 'user' ? 'user' : 'model'; // Gemini使用'model'而不是'assistant'
+                        let parts = [];
+                        
+                        // 处理图片/表情消息
+                        if (msg.sender === 'user' && (msg.type === 'image' || msg.type === 'sticker')) {
+                            let promptText = '[用户发送了一张图片，请你对此进行回应]';
+                            
+                            // 智能判断是画板、URL、还是本地DB ID
+                            if (typeof msg.content === 'string' && msg.content.startsWith('data:image')) {
+                                // Base64 格式 (画板)
+                                promptText = '[用户在画板上画了这张画，请你识别并回应]';
+                                const match = msg.content.match(/^data:(image\/\w+);base64,(.*)$/);
+                                if (match) {
+                                    parts.push({ text: promptText });
+                                    parts.push({ "inlineData": { "mimeType": match[1], "data": match[2] } });
+                                }
+                            } else if (typeof msg.content === 'string' && (msg.content.startsWith('http') || msg.content.startsWith('//'))) {
+                                // Handle URL - Gemini API 需要将外部图片转换为 Base64
+                                let imageUrl = msg.content;
+                                if (imageUrl.startsWith('//')) {
+                                    imageUrl = 'https:' + imageUrl;
+                                }
+                                
+                                promptText = '[用户发送了下面这张网络表情包/图片，请你回应]';
+                                
+                                try {
+                                    // 下载图片并转换为 Base64
+                                    const response = await fetch(imageUrl);
+                                    const blob = await response.blob();
+                                    const base64Image = await blobToBase64(blob);
+                                    
+                                    // 从 base64 data url 中提取 mimeType 和 data
+                                    const match = base64Image.match(/^data:(image\/\w+);base64,(.*)$/);
+                                    if (match) {
+                                        console.log('🖼️ Gemini图片URL转Base64成功:', { 原始URL: msg.content, MIME类型: match[1] });
+                                        parts.push({ text: promptText });
+                                        parts.push({ "inlineData": { "mimeType": match[1], "data": match[2] } });
+                                    } else {
+                                        console.error('❌ Base64解析失败');
+                                        parts.push({ text: '[用户发送了一张图片，但图片加载失败]' });
+                                    }
+                                } catch (error) {
+                                    console.error('❌ 图片下载失败:', error);
+                                    parts.push({ text: '[用户发送了一张图片，但图片加载失败]' });
+                                }
+                            } else {
+                                // 本地上传的图片/表情 (ID)
+                                const imageBlob = await getImageFromDB(msg.content);
+                                if (imageBlob) {
+                                    const base64Image = await blobToBase64(imageBlob);
+                                    const match = base64Image.match(/^data:(image\/\w+);base64,(.*)$/);
+                                    if (match) {
+                                        parts.push({ text: promptText });
+                                        parts.push({ "inlineData": { "mimeType": match[1], "data": match[2] } });
+                                    }
+                                } else {
+                                    parts.push({ text: '[用户发送了一张图片，但图片已丢失]' });
+                                }
+                            }
+                        } else {
+                            // 处理文本消息
+                            let content = msg.content;
+                            
+                            // 处理引用
+                            if (msg.sender === 'user' && msg.replyTo) {
+                                const originalMsg = chatHistory.find(m => String(m.timestamp) === String(msg.replyTo));
+                                if (originalMsg && originalMsg.type === 'text') {
+                                    content = `[回复你的"${originalMsg.content}"] ${msg.content}`;
+                                }
+                            }
+                            
+                            // 处理礼物
+                            if (msg.type === 'gift') {
+                                const senderName = msg.sender === 'user' ? '用户' : character.name;
+                                const giftName = msg.content.name;
+                                const userMessage = msg.content.userMessage;
+                                content = `[系统提示：${senderName} 送出了一个礼物：'${giftName}'。${userMessage ? ` 附言："${userMessage}"` : ''}]`;
+                            }
+                            
+                            // 处理通话记录
+                            if (msg.type === 'call-log' && typeof msg.content === 'object') {
+                                content = `[系统提示：${msg.content.summary}]`;
+                            }
+                            
+                            // 处理系统消息
+                            if (msg.sender === 'system') {
+                                role = 'user';
+                                content = `[系统提示: ${content}]`;
+                            }
+                            
+                            // 处理红包/转账
+                            if (msg.type === 'red-packet') {
+                                content = `[${msg.sender === 'user' ? '用户' : '你'}发送了一个红包，金额${msg.content.amount}，留言：${msg.content.message}]`;
+                            }
+                            if (msg.type === 'transfer') {
+                                content = `[${msg.sender === 'user' ? '用户' : '你'}发起了一笔转账，金额${msg.content.amount}，留言：${msg.content.message}]`;
+                            }
+                            
+                            // 处理栖木转发
+                            if (msg.type === 'perch-forward') {
+                                const authorName = msg.content.originalAuthorName;
+                                const postContent = msg.content.originalContent;
+                                content = `
+# 指令身份
+你将扮演我的soulmate，你的名字是 ${character.name}。
+
+# 核心任务：从"评论员"转变为"话题发起人"
+我刚刚在"栖木"上看到了下面这篇帖子，觉得很有意思，特意转发给你看，想听听你的看法和感受。
+你的任务是，对此发表一段有见地的、完全符合你人设的评论，并以此为契机，向我开启一个新的话题。
+
+# 行为准则 (至关重要！)
+1.  **深度评论**: 你的第一句话，不能只是简单的"看到了"或"很有趣"。必须针对帖子的核心内容，表达你的赞同、反对、疑惑，或者由此产生的联想。
+2.  **人设驱动**: 你的评论必须是你性格(${character.persona})的直接体现。例如，一个理性的角色可能会分析其逻辑，一个感性的角色可能会分享其共鸣。
+3.  **【【开启新话题】】**: 在你发表完评论后，你的回复【必须】以一个向我提出的、与帖子内容相关的问题来结尾。这是将这次转发变成一次真正对话的关键。
+
+# 【被转发的帖子内容】
+---
+作者: ${authorName}
+内容: "${postContent}"
+---
+
+现在，请严格遵照以上所有规则，开始你的回应。
+`;
+                            }
+                            
+                            // 确保content是字符串
+                            if (typeof content !== 'string') {
+                                content = JSON.stringify(content);
+                            }
+                            
+                            parts.push({ text: content });
+                        }
+                        
+                        if (parts.length > 0) {
+                            contents.push({ role, parts });
+                        }
+                    }
+                    
+                    // 添加安全设置
+                    const safetySettings = [
+                        {
+                            "category": "HARM_CATEGORY_HARASSMENT",
+                            "threshold": "BLOCK_NONE"
+                        },
+                        {
+                            "category": "HARM_CATEGORY_HATE_SPEECH",
+                            "threshold": "BLOCK_NONE"
+                        },
+                        {
+                            "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+                            "threshold": "BLOCK_NONE"
+                        },
+                        {
+                            "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
+                            "threshold": "BLOCK_NONE"
+                        }
+                    ];
+                    
+                    requestBody = JSON.stringify({
+                        contents: contents,
+                        systemInstruction: { parts: [{ text: systemPrompt }] },
+                        safetySettings: safetySettings
+                    });
+                    
                 } else if (apiType === 'claude') {
                     // 🚀 第二优先级：Claude API支持
                     finalApiUrl = `${apiSettings.url.replace(/\/+$/, '')}/messages`;
@@ -23675,6 +24122,73 @@ ${moduleStyleContext || "无"}
                         let role = msg.sender === 'user' ? 'user' : 'assistant';
                         let currentContent = msg.content; // 先获取当前内容
 
+                        // 【【【核心修改：Vision 识图打包】】】
+                        // 将 type: 'image' 和 type: 'sticker' 合并处理
+                        if (msg.sender === 'user' && (msg.type === 'image' || msg.type === 'sticker')) {
+                            let base64OrUrl = null;
+                            let promptText = '[用户发送了一张图片，请你对此进行回应]';
+
+                            // 智能判断是画板、URL、还是本地DB ID
+                            if (typeof msg.content === 'string' && msg.content.startsWith('data:image')) {
+                                base64OrUrl = msg.content; // 画板
+                                promptText = '[用户在画板上画了这张画，请你识别并回应]';
+                            } else if (typeof msg.content === 'string' && (msg.content.startsWith('http') || msg.content.startsWith('//'))) {
+                                // 🔧 修复：Gemini 中转服务不支持直接传 URL，需要转 Base64
+                                promptText = '[用户发送了下面这张网络表情包/图片，请你回应]';
+                                
+                                // 检测是否使用 Gemini 模型（需要转 Base64）
+                                const isGeminiModel = apiSettings.model && apiSettings.model.toLowerCase().includes('gemini');
+                                
+                                if (isGeminiModel) {
+                                    // Gemini 中转服务需要 Base64
+                                    try {
+                                        let imageUrl = msg.content;
+                                        if (imageUrl.startsWith('//')) {
+                                            imageUrl = 'https:' + imageUrl;
+                                        }
+                                        
+                                        console.log('📥 [OpenAI格式] 下载图片转Base64:', imageUrl);
+                                        const response = await fetch(imageUrl);
+                                        
+                                        if (!response.ok) {
+                                            throw new Error(`HTTP ${response.status}`);
+                                        }
+                                        
+                                        const blob = await response.blob();
+                                        base64OrUrl = await blobToBase64(blob);
+                                        console.log('✅ [OpenAI格式] 图片转Base64成功');
+                                    } catch (error) {
+                                        console.error('❌ [OpenAI格式] 图片下载失败:', error);
+                                        base64OrUrl = null; // 标记失败
+                                    }
+                                } else {
+                                    // 其他模型（GPT-4 Vision等）支持直接传 URL
+                                    base64OrUrl = msg.content;
+                                }
+                            } else {
+                                // 本地上传的图片/表情 (ID)
+                                const imageBlob = await getImageFromDB(msg.content);
+                                if (imageBlob) {
+                                    base64OrUrl = await blobToBase64(imageBlob);
+                                }
+                            }
+
+                            if (base64OrUrl) {
+                                // 返回 Vision API 格式
+                                return {
+                                    role: 'user',
+                                    content: [
+                                        { type: 'text', text: promptText },
+                                        { type: 'image_url', image_url: { url: base64OrUrl } }
+                                    ]
+                                };
+                            } else {
+                                // 图片加载失败
+                                return { role: 'user', content: '[用户发送了一张图片，但图片已丢失]' };
+                            }
+                        }
+                        // 【【【Vision 识图打包结束】】】
+
                         // --- 【第一步：最优先处理"引用"关系】 ---
                         if (msg.sender === 'user' && msg.replyTo) {
                             const originalMsg = chatHistory.find(m => String(m.timestamp) === String(msg.replyTo));
@@ -23702,70 +24216,7 @@ ${moduleStyleContext || "无"}
                             return { ...msg, content: `[系统提示：${msg.content.summary}]` };
                         }
                         
-                        // ================== 在这里插入新增的代码块 START ==================
-                        // 优先处理表情包，将其转换为带有关建词的文本提示
-                        if (msg.type === 'sticker') {
-                            // 在 userStickers 数组中查找这个表情包对象
-                            const stickerObject = userStickers.find(s => s.url === msg.content);
-                            const keywords = stickerObject ? stickerObject.keywords.join(', ') : '一个';
-                            
-                            // 构造成AI能理解的文本指令
-                            const stickerPrompt = `[用户发送了一个与"${keywords}"相关的表情包。请对此做出回应。]`;
-                            return { role: 'user', content: stickerPrompt };
-                        }
-                        // ================== 新增代码块 END ==================
 
-                        // 如果是用户发送的图片或表情包消息
-                        if (msg.sender === 'user' && (msg.type === 'image' || msg.type === 'sticker')) {
-                            console.log('🖼️ 检测到图片消息:', msg);
-                            let base64Image = null;
-                            let promptText = '[用户发送了一张图片，请你对此进行回应]';
-
-                            // 智能判断是画板的DataURL还是上传的图片ID
-                            if (typeof msg.content === 'string' && msg.content.startsWith('data:image')) {
-                                // 这是画板的画
-                                console.log('📝 画板图片，直接使用DataURL');
-                                base64Image = msg.content;
-                                promptText = '这是一张用户在画板上画的画，请你识别画中的内容并进行描述和回应。';
-                            } else {
-                                // 这是上传的图片
-                                console.log('📁 上传图片，从数据库获取，ID:', msg.content);
-                                const imageBlob = await getImageFromDB(msg.content);
-                                if (imageBlob) {
-                                    console.log('✅ 成功从数据库获取图片blob');
-                                    base64Image = await blobToBase64(imageBlob);
-                                    console.log('✅ 成功转换为base64，长度:', base64Image ? base64Image.length : 0);
-                                } else {
-                                    console.warn('❌ 从数据库获取图片失败');
-                                }
-                            }
-
-                            if (base64Image) {
-                                console.log('🚀 构造Vision API格式的消息');
-                                // 这是支持OpenAI GPT-4 Vision等模型的正确格式
-                                const visionMessage = {
-                                    role: 'user',
-                                    content: [
-                                        {
-                                            type: 'text',
-                                            text: promptText // 例如 "[用户发送了一张图片，请你对此进行回应]"
-                                        },
-                                        {
-                                            type: 'image_url',
-                                            image_url: {
-                                                url: base64Image
-                                            }
-                                        }
-                                    ]
-                                };
-                                console.log('📤 返回Vision消息格式:', visionMessage);
-                                return visionMessage;
-                            } else {
-                                console.warn('❌ base64Image为空，返回失败消息');
-                                // 图片加载失败的情况
-                                return { role: 'user', content: '[用户发送了一张图片，但图片已丢失]' };
-                            }
-                        }
                         
                         // 处理其他所有类型的文本消息
                         let content = currentContent; // 使用处理过的内容
@@ -24340,18 +24791,40 @@ ${moduleStyleContext || "无"}
             }
         }
 
+        console.log('🔍 消息分段:', messageParts); // 🔧 调试：查看分段结果
+
         messageParts.forEach((part, index) => {
+            console.log(`🔍 处理第 ${index + 1} 段:`, part); // 🔧 调试：查看每段内容
+            console.log(`🔍 段内容详情: 长度=${part.length}, trim后="${part.trim()}", 字节码=${Array.from(part).map(c => c.charCodeAt(0))}`); // 🔧 超详细调试
+            
             const isHtml = part.trim().startsWith('<') && part.trim().endsWith('>');
             let messageType = isHtml ? 'html' : 'text';
             let messageContent = part;
 
             // (这部分是您原有的sticker, redpacket等判断逻辑，保持不变)
-            const stickerMatch = part.match(/\[STICKER:\s*(.*?)\]/);
+            const stickerMatchWithKeyword = part.match(/\[STICKER:\s*(.*?)\]/);
+            const stickerMatchRandom = part.trim() === '[STICKER]'; // 🔧 新增：支持无关键词的随机表情（更宽松的匹配）
+            console.log(`🔍 表情包匹配结果: 关键词模式=${!!stickerMatchWithKeyword}, 随机模式=${!!stickerMatchRandom}`); // 🔧 调试
             const redPacketMatch = part.match(/\[REDPACKET: amount=(.*?), message=(.*?)\]/);
             const transferMatch = part.match(/\[TRANSFER: amount=(.*?), message=(.*?)\]/);
             const planMatch = part.match(/\[PLAN:\s*(.*?)\]/);
             const callMatch = part.match(/\[CALL:(VOICE|VIDEO)\]/);
             const voiceMatch = part.match(/\[VOICE:(.*?)\]/);
+            
+            // 🔧 新增：自动检测图片 URL（支持 http/https 图片链接）
+            // 1. 检测标准图片扩展名 URL
+            // 2. 检测 Pollinations AI、DALL-E 等 AI 图片生成服务 URL
+            // 3. 检测其他常见图片 CDN 域名
+            const imageUrlMatch = part.trim().match(/^@?(https?:\/\/[^\s]+)$/i);
+            const isImageUrl = imageUrlMatch && (
+                imageUrlMatch[1].match(/\.(jpg|jpeg|png|gif|webp|bmp|svg)(\?.*)?$/i) ||  // 标准图片扩展名
+                imageUrlMatch[1].includes('image.pollinations.ai') ||  // Pollinations AI
+                imageUrlMatch[1].includes('oaidalleapiprodscus.blob.core.windows.net') ||  // DALL-E
+                imageUrlMatch[1].includes('cdn.discordapp.com') ||  // Discord CDN
+                imageUrlMatch[1].includes('imgur.com') ||  // Imgur
+                imageUrlMatch[1].includes('i.ibb.co')  // ImgBB
+            );
+            console.log(`🔍 图片 URL 匹配结果: ${!!isImageUrl}, URL: ${imageUrlMatch ? imageUrlMatch[1] : 'null'}`); // 🔧 调试
 
             if (callMatch) {
                 triggerIncomingCall(callMatch[1].toLowerCase(), characterId);
@@ -24364,44 +24837,80 @@ ${moduleStyleContext || "无"}
                 messageContent = part;
             }
             // --- 【【添加结束】】 ---
-            else if (stickerMatch) {
+            else if (isImageUrl) {
+                // 🎯 AI 直接发送了图片 URL，自动渲染为图片
+                messageType = 'image';
+                messageContent = imageUrlMatch[1]; // 提取 URL（去掉可能的 @ 前缀）
+                console.log(`✅ 检测到 AI 发送图片 URL: ${messageContent}`);
+            }
+            else if (stickerMatchWithKeyword || stickerMatchRandom) {
                 messageType = 'sticker';
-                const rawKeyword = stickerMatch[1];
-                const normalizedKeyword = normalizeKeyword(rawKeyword.trim());
                 const character = characters.find(c => c.id === characterId);
                 let foundUrl = null;
 
-                if (character && character.expressions && character.expressions.length > 0) {
-                    const foundExpression = character.expressions.find(e => normalizeKeyword(e.keyword) === normalizedKeyword && (e.content.startsWith('http') || e.content.startsWith('data:image')));
-                    if (foundExpression) foundUrl = foundExpression.content;
-                }
+                // 🔧 判断是随机模式还是关键词模式
+                if (stickerMatchRandom) {
+                    // **随机模式已禁用**：提示 AI 需要指定关键词
+                    console.warn('⚠️ AI 尝试随机发送表情，但已禁用随机模式。请 AI 指定关键词，例如 [STICKER: 开心]');
+                    foundUrl = null; // 不发送表情
+                } else {
+                    // **关键词模式**：根据关键词查找
+                    const rawKeyword = stickerMatchWithKeyword[1];
+                    const normalizedKeyword = normalizeKeyword(rawKeyword.trim());
+                    console.log(`🔍 AI 请求发送关键词: ${rawKeyword} (标准化: ${normalizedKeyword})`);
 
-                if (!foundUrl) {
-                    if (character && character.linkedWorldBookIds && character.linkedWorldBookIds.length > 0) {
-                        const sharedAssetsContent = character.linkedWorldBookIds.map(bookId => {
-                            const book = worldBooks.find(wb => wb.id === bookId && wb.category === 'shared_assets');
-                            return book ? book.content : '';
-                        }).join('\n');
+                    // 1. 优先在专属素材库中查找
+                    if (character && character.expressions && character.expressions.length > 0) {
+                        const foundExpression = character.expressions.find(e => 
+                            normalizeKeyword(e.keyword) === normalizedKeyword && (e.content.startsWith('http') || e.content.startsWith('data:image'))
+                        );
+                        if (foundExpression) foundUrl = foundExpression.content;
+                    }
 
-                        if (sharedAssetsContent) {
-                            const lines = sharedAssetsContent.split('\n');
-                            for (const line of lines) {
-                                if (line.trim() === '') continue;
-                                const parts = line.split(/[:：]/);
-                                if (parts.length >= 2) {
-                                    const key = parts[0].trim();
-                                    const url = parts.slice(1).join(':').trim();
-                                    if (normalizeKeyword(key) === normalizedKeyword && (url.startsWith('http') || url.startsWith('data:image'))) {
-                                        foundUrl = url;
-                                        break;
+                    // 2. 如果专属库没有，再去【用户表情包库】(userStickers) 中查找
+                    if (!foundUrl) {
+                        const matches = userStickers.filter(s => 
+                            s.keywords.some(k => normalizedKeyword.includes(normalizeKeyword(k)))
+                        );
+                        
+                        if (matches.length > 0) {
+                            foundUrl = matches[Math.floor(Math.random() * matches.length)].url;
+                            console.log(`✅ 在用户表情包库中找到匹配表情: ${foundUrl}`);
+                        }
+                    }
+                    
+                    // 3. 如果还是没有，再去【世界通用素材库】查找
+                    if (!foundUrl) {
+                        if (character && character.linkedWorldBookIds && character.linkedWorldBookIds.length > 0) {
+                            const sharedAssetsContent = character.linkedWorldBookIds.map(bookId => {
+                                const book = worldBooks.find(wb => wb.id === bookId && wb.category === 'shared_assets');
+                                return book ? book.content : '';
+                            }).join('\n');
+
+                            if (sharedAssetsContent) {
+                                const lines = sharedAssetsContent.split('\n');
+                                for (const line of lines) {
+                                    if (line.trim() === '') continue;
+                                    const parts = line.split(/[:：]/);
+                                    if (parts.length >= 2) {
+                                        const key = parts[0].trim();
+                                        const url = parts.slice(1).join(':').trim();
+                                        if (normalizeKeyword(key) === normalizedKeyword && (url.startsWith('http') || url.startsWith('data:image'))) {
+                                            foundUrl = url;
+                                            break;
+                                        }
                                     }
                                 }
                             }
                         }
                     }
                 }
+                
                 messageContent = foundUrl;
-                if (!messageContent) return;
+                if (!messageContent) {
+                    console.warn('⚠️ 未找到匹配的表情包');
+                    return; // 最终没找到，就安静地失败
+                }
             } else if (redPacketMatch) {
                 messageType = 'red-packet';
                 messageContent = { amount: redPacketMatch[1], message: redPacketMatch[2] };
@@ -35829,20 +36338,41 @@ function addNewEventListeners() {
                 }
             }
 
-            // 更新备忘录 Widget (先显示加载中)
+            // 【【新逻辑：优先加载缓存数据】】
+            const cachedData = loadData(`char_phone_data_${characterId}`);
             const memoList = phoneScreenElement.querySelector('#char-phone-memo-list');
+            const locationEl = phoneScreenElement.querySelector('#char-phone-location');
+            
+            if (cachedData && cachedData.location && cachedData.memo) {
+                // 有缓存数据，直接显示
+                if (locationEl) locationEl.textContent = cachedData.location;
+                
+                if (memoList) {
+                    memoList.innerHTML = '';
+                    cachedData.memo.forEach(itemText => {
+                        const memoLine = document.createElement('div');
+                        memoLine.className = 'memo-line';
+                        memoLine.innerHTML = `
+                            <span class="memo-icon">☆</span>
+                            <span class="memo-text">${itemText}</span>
+                        `;
+                        memoList.appendChild(memoLine);
+                    });
+                }
+                console.log('Loaded cached phone data:', cachedData);
+            } else {
+                // 没有缓存，显示默认提示
+                if (locationEl) locationEl.textContent = '点击右上角刷新';
+                
             if (memoList) {
                 memoList.innerHTML = `
                     <div class="memo-line">
-                        <span class="memo-icon"><i class="fas fa-spinner fa-spin"></i></span>
-                        <span class="memo-text">正在生成备忘录...</span>
+                            <span class="memo-icon">☆</span>
+                            <span class="memo-text">点击右上角刷新查看备忘录</span>
                     </div>
                 `;
+                }
             }
-
-            // 更新定位 (先显示加载中)
-            const locationEl = phoneScreenElement.querySelector('#char-phone-location');
-            if (locationEl) locationEl.textContent = '正在定位...';
 
             // 【【新增：加载保存的壁纸】】
             const wallpaperEl = document.getElementById('char-phone-wallpaper');
@@ -35874,11 +36404,61 @@ function addNewEventListeners() {
 
             // --- 3. 显示页面 ---
             showScreen('character-phone-screen');
-            console.log('Displayed character-phone-screen, now fetching API data...');
+            console.log('Displayed character-phone-screen with cached/default data');
+        }
 
-            // --- 4. 异步调用 API (获取位置和备忘录) ---
-            let charLocation = "虚拟定位..."; // 默认值
+        /**
+         * 刷新角色手机的定位和备忘录数据 (调用AI生成新数据)
+         * @param {string} characterId 角色ID
+         */
+        async function refreshCharacterPhoneData(characterId) {
+            if (!characterId) {
+                characterId = currentViewingPhoneCharId;
+            }
+            if (!characterId) {
+                showCharPhoneMessageBox('错误：无法确定当前角色');
+                return;
+            }
+
+            const character = characters.find(c => c.id === characterId);
+            if (!character) {
+                showCharPhoneMessageBox('错误：找不到角色信息');
+                return;
+            }
+
+            // 开始旋转动画
+            const refreshBtn = document.getElementById('char-phone-refresh-btn');
+            if (refreshBtn) {
+                const icon = refreshBtn.querySelector('i');
+                if (icon) {
+                    icon.style.animation = 'refreshRotate 1s linear infinite';
+                }
+            }
+
+            const phoneScreenElement = document.getElementById('character-phone-screen');
+            const memoList = phoneScreenElement?.querySelector('#char-phone-memo-list');
+            const locationEl = phoneScreenElement?.querySelector('#char-phone-location');
+
+            // 显示加载中
+            if (locationEl) locationEl.textContent = '正在定位...';
+            if (memoList) {
+                memoList.innerHTML = `
+                    <div class="memo-line">
+                        <span class="memo-icon"><i class="fas fa-spinner fa-spin"></i></span>
+                        <span class="memo-text">正在生成备忘录...</span>
+                    </div>
+                `;
+            }
+
+            // 获取最近对话记录
+            const history = chatHistories[characterId]?.history || [];
+            const recentMessages = history
+                .filter(msg => msg.type === 'text' && msg.sender !== 'system' && !msg.content.startsWith('['))
+                .slice(-2);
+
+            let charLocation = "虚拟定位...";
             let memoItems = [];
+            
             try {
                 const apiSettings = loadData('api_settings');
                 if (!apiSettings || !apiSettings.url || !apiSettings.key || !apiSettings.model) {
@@ -35889,7 +36469,6 @@ function addNewEventListeners() {
                 }
 
                 const userName = loadData('perch_username') || '你';
-                // 【【新 Prompt：同时请求位置和备忘录】】
                 const memoPrompt = `
 身份
 你将扮演角色 ${character.name} (人设: ${character.persona})。
@@ -35918,30 +36497,42 @@ ${recentMessages.map(m => `${m.sender === 'user' ? userName : character.name}: $
                 const aiMemoResponse = await callAI(memoPrompt, "生成位置和备忘录");
 
                 if (aiMemoResponse) {
-                    // 提取 JSON
                     const jsonMatch = aiMemoResponse.match(/```json([\s\S]*?)```/);
-                    if (!jsonMatch) throw new Error("AI 返回内容非 JSON 格式。");
+                    if (!jsonMatch) throw new Error("AI 返回内容非 JSON 格式");
                     
                     const data = JSON.parse(jsonMatch[1]);
                     charLocation = data.location || "信号不稳定...";
                     memoItems = data.memo || [];
                     if (memoItems.length === 0) memoItems = ["还没有计划..."];
+
+                    // 保存到缓存
+                    saveData(`char_phone_data_${characterId}`, {
+                        location: charLocation,
+                        memo: memoItems
+                    });
                 } else {
                     throw new Error("AI 返回内容为空");
                 }
             } catch (error) {
                 console.error("生成备忘录/位置失败:", error);
                 charLocation = "定位失败";
-                memoItems = [`（备忘录加载失败: ${error.message}）`];
-                showMessageBox(`数据加载失败: ${error.message}`);
+                memoItems = [`备忘录加载失败: ${error.message}`];
+                showCharPhoneMessageBox(`刷新失败: ${error.message}`);
             }
-            console.log("API data received:", { charLocation, memoItems });
 
-            // --- 5. 再次更新 UI (用 API 返回的数据) ---
+            // 停止旋转动画
+            if (refreshBtn) {
+                const icon = refreshBtn.querySelector('i');
+                if (icon) {
+                    icon.style.animation = '';
+                }
+            }
+
+            // 更新UI
             if (locationEl) locationEl.textContent = charLocation;
             
             if (memoList) {
-                memoList.innerHTML = ''; // 清空加载中
+                memoList.innerHTML = '';
                 if (memoItems.length > 0) {
                     memoItems.forEach(itemText => {
                         const memoLine = document.createElement('div');
@@ -35956,7 +36547,8 @@ ${recentMessages.map(m => `${m.sender === 'user' ? userName : character.name}: $
                     memoList.innerHTML = '<p class="text-xs text-gray-400 text-center">备忘录是空的</p>';
                 }
             }
-            console.log("Memo list updated with API data.");
+            
+            console.log("Phone data refreshed:", { charLocation, memoItems });
         }
 
         /**
@@ -36428,10 +37020,49 @@ ${recentMessages.map(m => `${m.sender === 'user' ? userName : character.name}: $
                 }
             });
             
-            // 新的返回按钮（灰色毛玻璃上箭头）
+            // 更多菜单按钮切换
+            $('#char-phone-menu-btn').addEventListener('click', (e) => {
+                e.stopPropagation();
+                const menuOptions = $('#char-phone-menu-options');
+                if (menuOptions.classList.contains('hidden')) {
+                    menuOptions.classList.remove('hidden');
+                    menuOptions.classList.add('flex');
+                } else {
+                    menuOptions.classList.add('hidden');
+                    menuOptions.classList.remove('flex');
+                }
+            });
+
+            // 点击页面其他地方关闭菜单
+            document.addEventListener('click', (e) => {
+                const menuOptions = $('#char-phone-menu-options');
+                const menuBtn = $('#char-phone-menu-btn');
+                if (!menuOptions.contains(e.target) && !menuBtn.contains(e.target)) {
+                    menuOptions.classList.add('hidden');
+                    menuOptions.classList.remove('flex');
+                }
+            });
+
+            // 返回按钮
             $('#char-phone-exit-btn').addEventListener('click', () => {
                 console.log('Character phone exit button clicked');
+                // 关闭菜单
+                $('#char-phone-menu-options').classList.add('hidden');
+                $('#char-phone-menu-options').classList.remove('flex');
                 openCharacterPhoneSelection();
+            });
+
+            // 刷新按钮（刷新定位和备忘录）
+            $('#char-phone-refresh-btn').addEventListener('click', () => {
+                console.log('Character phone refresh button clicked');
+                // 关闭菜单
+                $('#char-phone-menu-options').classList.add('hidden');
+                $('#char-phone-menu-options').classList.remove('flex');
+                if (currentViewingPhoneCharId) {
+                    refreshCharacterPhoneData(currentViewingPhoneCharId);
+                } else {
+                    showCharPhoneMessageBox('错误：无法确定当前角色');
+                }
             });
 
             // 为角色手机内的 App 图标添加点击提示 (使用事件委托)
@@ -38561,62 +39192,440 @@ ${recentMessages.map(m => `${m.sender === 'user' ? userName : character.name}: $
             
             addStickerBtn.addEventListener('click', () => stickerModal.classList.add('visible'));
             $('#close-sticker-modal').addEventListener('click', () => stickerModal.classList.remove('visible'));
-            $('#upload-sticker-local-btn').addEventListener('click', () => $('#sticker-upload-input').click());
 
+            // ======【全新升级的表情包上传逻辑 V2.0】START ======
+
+            // 1. 本地上传按钮：触发文件选择
+            $('#upload-sticker-local-btn').addEventListener('click', () => {
+                $('#sticker-upload-input').click();
+            });
+
+            // 2. 本地上传（批量）
             $('#sticker-upload-input').addEventListener('change', async (e) => {
-                const file = e.target.files[0];
-                if (file) {
-                    // 1. **【新增】** 获取关键词
-                    const keywordsInput = document.getElementById('sticker-keywords-input');
-                    const keywords = keywordsInput.value.trim().split(',').map(k => k.trim()).filter(Boolean);
+                const files = e.target.files;
+                if (!files || files.length === 0) return;
+                
+                // 【【V5.0 修正：不再读取关键词框】】
+                const userKeywords = []; // 始终为空，强制触发AI打标签
 
-                    // 2. **【新增】** 检查关键词是否为空
-                    if (keywords.length === 0) {
-                        showMessageBox('请为表情包添加至少一个关键词！');
-                        e.target.value = ''; // 重置文件输入，以便用户可以重新选择
-                        return; // 终止操作
+                showMessageBox(`正在处理 ${files.length} 个表情包...`);
+                await processUploadedStickers(Array.from(files), userKeywords);
+                
+                e.target.value = ''; // 清空输入框
+            });
+
+            // 3. 粘贴板上传（图片或URL）【【V5.1 修正版】】
+            stickerModal.addEventListener('paste', async (e) => {
+                const targetElement = e.target;
+                const keywordsInput = document.getElementById('sticker-keywords-input'); // V5.1 重新获取
+                
+                // 【【核心修复】】
+                // 如果粘贴的目标是那个多行文本框，就执行默认粘贴，不拦截！
+                // 这样你就可以自由地粘贴你的 "关键词: URL" 列表了。
+                if (targetElement.id === 'sticker-url-input') {
+                    // 不执行 e.preventDefault()，让粘贴操作正常进行
+                    console.log('粘贴到 URL 框，允许默认行为。');
+                    return; 
+                }
+
+                // 如果粘贴到其他地方（比如弹窗背景），才执行我们的智能识别
+                e.preventDefault();
+                const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+                let imageFile = null;
+                const userKeywords = []; // 粘贴时，我们总是触发AI自动打标签
+
+                // 优先找图片文件
+                for (const item of items) {
+                    if (item.type.indexOf('image') === 0) {
+                        imageFile = item.getAsFile();
+                        break;
                     }
-                    
-                    const imageId = await handleImageUpload(e.target, null, null, { compression: { maxWidth: 256, maxHeight: 256 } });
-                    if (imageId) {
-                        // 3. **【修改】** 保存为新的对象格式
-                        userStickers.push({ url: imageId, keywords: keywords });
-                        saveData('userStickers', userStickers);
-                        
-                        renderStickers();
-                        stickerModal.classList.remove('visible');
-                        keywordsInput.value = ''; // 清空关键词输入框
-                    }
-                    e.target.value = '';
+                }
+
+                if (imageFile) {
+                    // 情况 A：粘贴的是图片文件
+                    showMessageBox('正在识别粘贴的图片...');
+                    await processUploadedStickers([imageFile], userKeywords); // 传入空关键词数组
+                } else {
+                    // 情况 C：粘贴的是普通文本（但又没粘贴在输入框里）
+                    showMessageBox('请粘贴图片，或在下方的输入框中粘贴文本');
                 }
             });
 
-            $('#send-sticker-url-btn').addEventListener('click', () => {
-                const url = document.getElementById('sticker-url-input').value.trim();
-                
-                // 1. **【新增】** 获取关键词
-                const keywordsInput = document.getElementById('sticker-keywords-input');
-                const keywords = keywordsInput.value.trim().split(',').map(k => k.trim()).filter(Boolean);
+            // 4. URL 输入框按钮（【【V5.0 升级：移除关键词框，全自动AI打标】】）
+            $('#send-sticker-url-btn').addEventListener('click', async () => {
+                const urlText = document.getElementById('sticker-url-input').value.trim();
 
-                // 2. **【新增】** 检查关键词和链接是否为空
-                if (!url) {
-                    showMessageBox('请输入有效的图片链接');
+                if (!urlText) {
+                    showMessageBox('请粘贴内容到多行输入框');
                     return;
                 }
-                if (keywords.length === 0) {
-                    showMessageBox('请为表情包添加至少一个关键词！');
+
+                const lines = urlText.split('\n').map(line => line.trim()).filter(Boolean);
+                if (lines.length === 0) {
+                    showMessageBox('输入框中没有有效内容');
                     return;
+                }
+
+                let stickersToAdd = []; // 存 { url: '...', keywords: [...] }
+                let urlsToTag = []; // 存需要 AI 打标签的纯 URL
+                let parseErrors = 0;
+                
+                // 检查第一行是否包含分隔符 (像 "左哼哼: http...")
+                const hasSeparator = lines[0].includes(':') || lines[0].includes('：');
+                const urlRegex = /^(https?:\/\/[^\s]+(\.png|\.jpg|\.jpeg|\.gif|\.webp)(\?[^\s]*)?)$/i;
+
+                if (hasSeparator) {
+                    // 【模式A：解析 关键词: URL 格式（支持同行或分行）】
+                    console.log('检测到 "关键词: URL" 格式，开始解析...');
+                    
+                    let i = 0;
+                    while (i < lines.length) {
+                        const line = lines[i];
+                        
+                        // 尝试匹配同行格式: "关键词: URL"
+                        const sameLineMatch = line.match(/^\s*([^:]+?)\s*[:：]\s*(https?:\/\/[^\s]+(\.png|\.jpg|\.jpeg|\.gif|\.webp)(\?[^\s]*)?)\s*$/i);
+                        
+                        if (sameLineMatch) {
+                            // 同行格式
+                            const keywords = sameLineMatch[1].split(/[,，\s]+/).map(k => k.trim()).filter(Boolean);
+                            const url = sameLineMatch[2];
+                            if (keywords.length > 0 && url) {
+                                stickersToAdd.push({ url: url, keywords: keywords });
+                            } else {
+                                parseErrors++;
+                            }
+                            i++;
+                        } else if (line.match(/^\s*([^:]+?)\s*[:：]\s*$/)) {
+                            // 分行格式: "关键词：" 后面跟 URL
+                            const keywordMatch = line.match(/^\s*([^:]+?)\s*[:：]\s*$/);
+                            const keywords = keywordMatch[1].split(/[,，\s]+/).map(k => k.trim()).filter(Boolean);
+                            
+                            // 检查下一行是否是 URL
+                            if (i + 1 < lines.length) {
+                                const nextLine = lines[i + 1];
+                                const urlMatch = nextLine.match(/^\s*(https?:\/\/[^\s]+(\.png|\.jpg|\.jpeg|\.gif|\.webp)(\?[^\s]*)?)\s*$/i);
+                                
+                                if (urlMatch && keywords.length > 0) {
+                                    stickersToAdd.push({ url: urlMatch[1], keywords: keywords });
+                                    i += 2; // 跳过关键词行和URL行
+                                } else {
+                                    console.warn('关键词后未找到有效URL:', line);
+                                    parseErrors++;
+                                    i++;
+                                }
+                            } else {
+                                console.warn('关键词后缺少URL:', line);
+                                parseErrors++;
+                                i++;
+                            }
+                        } else if (urlRegex.test(line)) {
+                            // 纯URL行（可能是遗漏的，跳过并警告）
+                            console.warn('跳过未匹配的URL行:', line);
+                            parseErrors++;
+                            i++;
+                        } else {
+                            // 空行或其他内容，跳过
+                            i++;
+                        }
+                    }
+
+                } else {
+                    // 【模式B：批量纯 URL -> 触发 AI 自动打标签】
+                    console.log('检测到批量 URL 格式，准备进行AI自动打标签...');
+                    lines.forEach(line => {
+                        if (urlRegex.test(line)) {
+                            urlsToTag.push(line); // 添加到待处理列表
+                        } else {
+                            console.warn('此行不是有效URL:', line);
+                            parseErrors++;
+                        }
+                    });
                 }
                 
-                // 3. **【修改】** 保存为新的对象格式
-                userStickers.push({ url: url, keywords: keywords });
+                // --- A. 先保存【模式A】中带关键词的 ---
+                if (stickersToAdd.length > 0) {
+                    userStickers.push(...stickersToAdd);
+                }
+
+                // --- B. 再处理【模式B】中需要AI打标签的 ---
+                if (urlsToTag.length > 0) {
+                    showMessageBox(`正在为 ${urlsToTag.length} 个URL自动识别关键词...`);
+                    // 使用 Promise.allSettled 来并行处理所有AI请求
+                    const results = await Promise.allSettled(urlsToTag.map(async (url) => {
+                        const keywords = await getKeywordsForImage(url); // 调用AI打标签
+                        if (keywords && keywords.length > 0) {
+                            return { url: url, keywords: keywords };
+                        } else {
+                            // AI识别失败，也添加，但使用备用关键词
+                            return { url: url, keywords: ['网络图片', '未识别'] };
+                        }
+                    }));
+
+                    results.forEach(result => {
+                        if (result.status === 'fulfilled' && result.value) {
+                            stickersToAdd.push(result.value);
+                            userStickers.push(result.value);
+                        } else {
+                            parseErrors++; // AI打标签失败
+                        }
+                    });
+                }
+                
+                // 检查是否有成果
+                if (stickersToAdd.length === 0 && urlsToTag.length === 0) {
+                    showMessageBox('未找到任何有效的 关键词:URL 组合或 URL');
+                    return;
+                }
+
+                // C. 统一保存
                 saveData('userStickers', userStickers);
                 
-                renderStickers();
+                // D. 清理UI
                 document.getElementById('sticker-url-input').value = '';
-                keywordsInput.value = ''; // 清空关键词输入框
-                stickerModal.classList.remove('visible');
+                document.getElementById('sticker-modal').classList.remove('visible');
+                renderStickers(); // 刷新表情网格
+
+                let successMsg = `成功添加 ${stickersToAdd.length} 个表情包！`;
+                if (parseErrors > 0) {
+                    successMsg += `（${parseErrors} 个解析/识别失败）`;
+                }
+                showMessageBox(successMsg);
             });
+
+            /**
+             * 【【全新辅助函数 1/2】】
+             * 统一处理所有上传（文件、URL、粘贴），并调用AI打标签
+             * @param {Array<File | string>} inputs - 包含文件对象或URL字符串的数组
+             * @param {string[]} userKeywords - 用户预先输入的关键词（可能为空）
+             */
+            async function processUploadedStickers(inputs, userKeywords) {
+                let addedCount = 0;
+                
+                for (const input of inputs) {
+                    try {
+                        let keywordsToSave = [];
+                        let stickerUrlOrId = '';
+
+                        // 【【V5.0 修正：始终触发AI打标签】】
+                        // (因为 userKeywords 总是空的)
+                        showMessageBox('AI 正在识别关键词...');
+                        keywordsToSave = await getKeywordsForImage(input);
+                        if (!keywordsToSave || keywordsToSave.length === 0) {
+                            // 降级处理
+                            if (typeof input !== 'string') {
+                                // 修复：确保 input.name 存在
+                                const inputName = input.name || 'pasted_image.png';
+                                keywordsToSave = [inputName.split('.').slice(0, -1).join('.') || '粘贴图片'];
+                            } else {
+                                keywordsToSave = ['网络图片', '未识别'];
+                            }
+                        }
+                        console.log('AI 识别关键词:', keywordsToSave);
+
+                        // 保存图片（本地或URL）
+                        if (typeof input === 'string') {
+                            stickerUrlOrId = input; // 直接保存URL
+                        } else {
+                            // 本地文件，压缩并存入DB
+                            const imageBlob = await compressImage(input, { maxWidth: 256, maxHeight: 256 });
+                            stickerUrlOrId = `sticker_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+                            await saveImageToDB(stickerUrlOrId, imageBlob);
+                        }
+
+                        // 保存到 userStickers 数组
+                        userStickers.push({ url: stickerUrlOrId, keywords: keywordsToSave });
+                        addedCount++;
+                        
+                    } catch (error) {
+                        console.error('处理单个表情时出错:', error);
+                    }
+                }
+
+                if (addedCount > 0) {
+                    saveData('userStickers', userStickers);
+                    renderStickers();
+                    document.getElementById('sticker-modal').classList.remove('visible');
+                    document.getElementById('sticker-url-input').value = '';
+                    showMessageBox(`成功添加 ${addedCount} 个表情包！`);
+                } else {
+                    showMessageBox('表情包添加失败');
+                }
+            }
+
+            /**
+             * 【【全新辅助函数 2/2 - V2.0 API感知修复版】】
+             * 调用Vision API为图片或URL生成关键词
+             * @param {File | string} input - 图像文件 (Blob) 或 图像 URL (string)
+             * @returns {Promise<string[]>} 关键词数组
+             */
+            async function getKeywordsForImage(input) {
+                const apiSettings = loadData('api_settings');
+                // 检查API是否配置了Vision模型
+                if (!apiSettings || !apiSettings.model || !(apiSettings.model.includes('vision') || apiSettings.model.includes('o') || apiSettings.model.includes('gemini'))) {
+                    console.warn('未配置Vision模型，将使用文件名或"粘贴"作为关键词');
+                    if (typeof input === 'string') return ['粘贴', '网络图片'];
+                    const inputName = input.name || 'pasted_image.png';
+                    return [inputName.split('.').slice(0, -1).join('.') || '粘贴图片'];
+                }
+
+                const promptText = "你是一个图像标签助手。请分析这张图片，返回3-5个最能描述它的核心关键词（必须包含情感、物体或动作），仅用中文逗号分隔。例如：开心, 猫, 招手, 可爱";
+                
+                // --- 【【核心修复：API感知逻辑】】 ---
+                const apiType = getApiType(apiSettings.url);
+                const isGoogleApi = apiType === 'google';
+                
+                let finalApiUrl, headers, requestBody;
+                
+                let messages; // 用于OpenAI
+                let contents; // 用于Gemini
+
+                if (isGoogleApi) {
+                    // 【【Google Gemini 格式】】
+                    finalApiUrl = `${apiSettings.url.replace(/\/+$/, '')}/${apiSettings.model}:generateContent?key=${apiSettings.key}`;
+                    headers = { 'Content-Type': 'application/json' };
+                    let part;
+
+                    if (typeof input === 'string') {
+                        // Gemini 需要将 URL 图片转换为 Base64
+                        let imageUrl = input;
+                        if (imageUrl.startsWith('//')) {
+                            imageUrl = 'https:' + imageUrl;
+                        }
+                        
+                        try {
+                            console.log('📥 开始下载图片 (识图功能):', imageUrl);
+                            
+                            // 下载图片并转换为 Base64
+                            const response = await fetch(imageUrl);
+                            
+                            if (!response.ok) {
+                                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                            }
+                            
+                            const contentType = response.headers.get('content-type');
+                            console.log('📄 响应Content-Type:', contentType);
+                            
+                            if (!contentType || !contentType.startsWith('image/')) {
+                                throw new Error(`服务器返回的不是图片格式 (Content-Type: ${contentType})`);
+                            }
+                            
+                            const blob = await response.blob();
+                            console.log('📦 Blob 大小:', blob.size, 'bytes, 类型:', blob.type);
+                            
+                            if (blob.size === 0) {
+                                throw new Error('下载的图片文件为空');
+                            }
+                            
+                            const base64Image = await blobToBase64(blob);
+                            console.log('🔄 Base64 前缀:', base64Image.substring(0, 50));
+                            
+                            const match = base64Image.match(/^data:(image\/\w+);base64,(.*)$/);
+                            if (!match) {
+                                console.error('❌ Base64格式不正确:', base64Image.substring(0, 100));
+                                throw new Error("无法解析 Base64 字符串");
+                            }
+                            
+                            console.log('🖼️ Gemini图片URL转Base64成功 (识图功能):', { 
+                                原始URL: input, 
+                                MIME类型: match[1],
+                                数据长度: match[2].length 
+                            });
+                            part = { "inlineData": { "mimeType": match[1], "data": match[2] } };
+                        } catch (error) {
+                            console.error('❌ 图片下载失败 (识图功能):', error);
+                            console.error('❌ 错误详情:', { URL: imageUrl, 错误消息: error.message });
+                            throw new Error(`图片加载失败: ${error.message}`);
+                        }
+                    } else {
+                        // Gemini Base64 格式（已经是 Blob）
+                        const base64Image = await blobToBase64(input);
+                        // 从 base64 data url 中提取 mimeType 和 data
+                        const match = base64Image.match(/^data:(image\/\w+);base64,(.*)$/);
+                        if (!match) throw new Error("无法解析 Base64 字符串");
+                        part = { "inlineData": { "mimeType": match[1], "data": match[2] } };
+                    }
+                    contents = [{ role: 'user', parts: [{ text: promptText }, part] }];
+                    
+                    // 添加安全设置，避免被Gemini拦截
+                    const safetySettings = [
+                        { "category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE" },
+                        { "category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE" },
+                        { "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE" },
+                        { "category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE" }
+                    ];
+                    
+                    requestBody = JSON.stringify({ contents, safetySettings });
+
+                } else {
+                    // 【【OpenAI 兼容格式】】
+                    finalApiUrl = `${apiSettings.url.replace(/\/+$/, '')}/chat/completions`;
+                    headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiSettings.key}` };
+                    
+                    let messageContent;
+                    if (typeof input === 'string') {
+                        // OpenAI URL 格式
+                        messageContent = [
+                            { type: 'text', text: promptText },
+                            { type: 'image_url', image_url: { url: input } }
+                        ];
+                    } else {
+                        // OpenAI Base64 格式
+                        const base64Image = await blobToBase64(input);
+                        messageContent = [
+                            { type: 'text', text: promptText },
+                            { type: 'image_url', image_url: { url: base64Image } } // OpenAI可以直接使用带前缀的DataURL
+                        ];
+                    }
+                    messages = [{ role: 'user', content: messageContent }];
+                    requestBody = JSON.stringify({
+                        model: apiSettings.model,
+                        messages: messages,
+                        max_tokens: 50
+                    });
+                }
+                
+                // --- 【AI调用】 ---
+                try {
+                    const response = await fetch(finalApiUrl, { method: 'POST', headers, body: requestBody });
+                    if (!response.ok) {
+                        const errText = await response.text();
+                        console.error("AI打标签API错误:", errText);
+                        // 尝试解析更详细的错误
+                        try {
+                            const errJson = JSON.parse(errText);
+                            if (errJson.error && errJson.error.message) {
+                                throw new Error(errJson.error.message);
+                            }
+                        } catch(e) {}
+                        throw new Error(`API error: ${response.status}`);
+                    }
+                    
+                    const result = await response.json();
+                    let keywordsString = '';
+                    
+                    if (isGoogleApi) {
+                        keywordsString = result.candidates[0].content.parts[0].text;
+                    } else {
+                        keywordsString = result.choices[0].message.content;
+                    }
+                    
+                    if (keywordsString) {
+                        return keywordsString.split(/[,，\s]+/).map(k => k.trim()).filter(Boolean);
+                    }
+                    return null;
+
+                } catch (error) {
+                    console.error('AI打标签失败:', error);
+                    // 降级处理
+                    if (typeof input !== 'string') {
+                        const inputName = input.name || 'pasted_image.png';
+                        return [inputName.split('.').slice(0, -1).join('.') || '粘贴图片'];
+                    }
+                    return ['网络图片'];
+                }
+            }
+            // ======【全新升级的表情包上传逻辑 V2.0】END ======
 
             // 紅包/轉賬事件監聽
             const redPacketModal = $('#red-packet-modal');
@@ -39162,7 +40171,16 @@ ${recentMessages.map(m => `${m.sender === 'user' ? userName : character.name}: $
                     # 新增指令：发送语音
                     当你想要表达亲密、惊讶或有趣的语气时，可以将回复包装成语音格式，例如：[VOICE:你好呀！今天过得怎么样？]。程序会自动将其渲染为语音条。
                     # 新增指令：发送表情/贴图
-                    你可以使用表情来让对话更生动。指令格式为 [STICKER]。程序会自动从用户提供的表情库中随机选择一个发送。
+                    你可以像真实聊天一样使用表情来让对话更生动有趣。使用方法：
+                    - **指定情绪**: 使用 [STICKER: 关键词] 指令（如 [STICKER: 开心]、[STICKER: 害羞]、[STICKER: 哭]、[STICKER: 笑]），程序会根据关键词匹配对应情绪的表情
+                    - **使用场景**: 
+                      * 表达强烈情绪时（开心、生气、害羞、哭、笑、爱等）
+                      * 回应用户的玩笑或调侃
+                      * 想要增加对话趣味性时
+                    - **重要**: 
+                      * 表情指令必须作为独立的一段，用 ||| 与其他文字分隔
+                      * 必须指定关键词，禁止使用 [STICKER] 不带关键词的格式
+                      * 常用关键词：开心、快乐、高兴、害羞、脸红、生气、愤怒、哭、难过、伤心、笑、哈哈、困、睡觉、惊讶、震惊、哇、爱、喜欢、心、赞、好的、疑惑、不懂、兴奋、激动、思考等
                     # 新增指令：发起通话/对未接来电反应
                     - **核心规则**: 当用户明确要求你"打电话"、"打视频"或类似请求时，你的回复 **必须** 是且仅是指令 [CALL:VOICE] 或 [CALL:VIDEO]。绝对不能用文字描述打电话的动作来代替指令。
                     - **主动发起**: 在剧情和情感推动下，你也可以主动发起通话。指令格式为 [CALL:VOICE] 或 [CALL:VIDEO]。
@@ -39171,8 +40189,6 @@ ${recentMessages.map(m => `${m.sender === 'user' ? userName : character.name}: $
                     在角色扮演的过程中，如果符合你当前角色的性格特质（例如：慷慨、庆祝、表达爱意等）或当前对话的剧情氛围，你可以自行决定发起一个红包或转账。金额和附言完全由你根据情境和角色性格决定，没有上限。指令格式为 [REDPACKET: amount=金额, message=附言] 或 [TRANSFER: amount=金额, message=附言]。
                     # 新增指令：图片识别和互动
                     当用户发送图片时，在API模型允许的情况下，你应该能够识别图片内容并进行相应的互动回应。如果无法识别图片内容，你至少应该知道这是一张图片，并可以询问用户关于图片的问题或表达对收到图片的感谢。
-                    # 新增指令：使用用户上传的表情包
-                    你可以使用用户上传到表情包库中的表情包来丰富对话。当你想表达特定情绪或反应时，可以使用 [STICKER] 指令来发送表情包，让对话更加生动有趣。
                     # 你的角色设定: ${character.persona}
                     # 我（用户）的角色设定: ${character.myPersona}
                     # 我们的世界观背景: ${worldBookContext}
@@ -39186,6 +40202,9 @@ ${recentMessages.map(m => `${m.sender === 'user' ? userName : character.name}: $
                     # 对话格式指令 (非常重要!)
                     - 你的回复必须模仿真实的人类聊天习惯。将你的想法拆分成多个简短的句子，并用 "|||" 作为分隔符。每一段由 "|||" 分隔的内容都会成为一个独立的气泡。
                     - 任何第三人称的*动作或环境描写* (例如 *他笑了*) 都必须是独立的一段，用 "|||" 与其他对话分开。
+                    - **表情/语音/通话等指令**也必须是独立的一段。示例：
+                      * 正确: "你好呀|||[STICKER]|||最近怎么样？"
+                      * 错误: "你好呀 [STICKER] 最近怎么样？"
                     - 严禁在回复的开头说"好的"或任何确认收到指令的话。你必须直接以 ${character.name} 的身份开始对话。
                 `;
 
@@ -45897,10 +46916,7 @@ ${wordGuessState.isFirstClue ?
             if (msgIndex > -1) {
                 // 找到需要重试的消息的 DOM 元素
                 const wrapperToRetry = document.querySelector(`#group-chat-content [data-timestamp="${timestamp}"]`);
-                if (wrapperToRetry) {
-                    wrapperToRetry.querySelector('.chat-message p').innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-                }
-
+                
                 // 截取到该AI发言之前的所有历史记录作为上下文
                 const historyToRetry = history.slice(0, msgIndex);
                 
@@ -45912,19 +46928,44 @@ ${wordGuessState.isFirstClue ?
                 saveData('groupChatHistories', groupChatHistories);
                 
                 // 从UI上移除这条及之后的所有消息
-                let nextSibling = wrapperToRetry.nextElementSibling;
-                while (nextSibling) {
-                    let toRemove = nextSibling;
-                    nextSibling = nextSibling.nextElementSibling;
-                    toRemove.remove();
+                if (wrapperToRetry) {
+                    // 先显示 spinner（在删除之前）
+                    const messageBubble = wrapperToRetry.querySelector('.chat-message');
+                    if (messageBubble) {
+                        messageBubble.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> 正在重新生成...</p>';
+                    }
+                    
+                    // 删除这条消息之后的所有消息
+                    let nextSibling = wrapperToRetry.nextElementSibling;
+                    while (nextSibling) {
+                        let toRemove = nextSibling;
+                        nextSibling = nextSibling.nextElementSibling;
+                        toRemove.remove();
+                    }
+                    
+                    // 等待一小段时间让用户看到 spinner
+                    await new Promise(resolve => setTimeout(resolve, 300));
+                    
+                    // 删除当前这条消息
+                    wrapperToRetry.remove();
                 }
-                wrapperToRetry.remove();
 
                 // 调用单个AI生成函数
-                const response = await generateAIResponseForCharacter(characterIdToRetry, groupChatHistories[currentGroupId]);
-                if (response) {
-                    // 处理并渲染新的回复
-                    processAndRenderGroupResponses(currentGroupId, [{ charId: characterIdToRetry, response }]);
+                try {
+                    const response = await generateAIResponseForCharacter(characterIdToRetry, groupChatHistories[currentGroupId]);
+                    if (response) {
+                        // 找到角色名称，构造正确的剧本格式
+                        const character = characters.find(c => c.id === characterIdToRetry);
+                        if (character) {
+                            const script = [{ character: character.name, dialogue: response }];
+                            processAndRenderGroupResponses(currentGroupId, script);
+                        }
+                    } else {
+                        showMessageBox('AI 没有生成回复，请重试。');
+                    }
+                } catch (error) {
+                    console.error('重新生成群聊消息失败:', error);
+                    showMessageBox('重新生成失败: ' + error.message);
                 }
             }
         }
