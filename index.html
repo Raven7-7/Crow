@@ -19262,21 +19262,74 @@ JSON 格式：
             try {
                 const aiResponse = await callAI(systemPrompt, "生成微信联系人和聊天记录");
                 if (aiResponse) {
+                    console.log("AI 原始返回内容:", aiResponse);
+                    
+                    let jsonData = null;
+                    
+                    // 尝试方法1: 匹配 ```json ... ```
                     const jsonMatch = aiResponse.match(/```json([\s\S]*?)```/);
                     if (jsonMatch) {
-                        currentWeChatData = JSON.parse(jsonMatch[1]);
+                        try {
+                            jsonData = JSON.parse(jsonMatch[1].trim());
+                            console.log("成功解析 JSON (方法1)");
+                        } catch (e) {
+                            console.warn("方法1解析失败:", e.message);
+                        }
+                    }
+                    
+                    // 尝试方法2: 匹配 ``` ... ``` (不带json标记)
+                    if (!jsonData) {
+                        const codeMatch = aiResponse.match(/```([\s\S]*?)```/);
+                        if (codeMatch) {
+                            try {
+                                jsonData = JSON.parse(codeMatch[1].trim());
+                                console.log("成功解析 JSON (方法2)");
+                            } catch (e) {
+                                console.warn("方法2解析失败:", e.message);
+                            }
+                        }
+                    }
+                    
+                    // 尝试方法3: 直接解析整个返回内容
+                    if (!jsonData) {
+                        try {
+                            jsonData = JSON.parse(aiResponse.trim());
+                            console.log("成功解析 JSON (方法3)");
+                        } catch (e) {
+                            console.warn("方法3解析失败:", e.message);
+                        }
+                    }
+                    
+                    // 尝试方法4: 查找第一个 { 到最后一个 }
+                    if (!jsonData) {
+                        const firstBrace = aiResponse.indexOf('{');
+                        const lastBrace = aiResponse.lastIndexOf('}');
+                        if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+                            try {
+                                const jsonStr = aiResponse.substring(firstBrace, lastBrace + 1);
+                                jsonData = JSON.parse(jsonStr);
+                                console.log("成功解析 JSON (方法4)");
+                            } catch (e) {
+                                console.warn("方法4解析失败:", e.message);
+                            }
+                        }
+                    }
+                    
+                    if (jsonData && jsonData.contacts && jsonData.chats) {
+                        currentWeChatData = jsonData;
                         currentWeChatData.generatedAt = Date.now();
                         saveCharacterAppData(characterId, 'WeChat', currentWeChatData);
                         console.log("Successfully generated and saved WeChat data for:", characterId);
                     } else {
-                        throw new Error("AI 返回的不是有效的 JSON 格式");
+                        console.error("AI返回内容:", aiResponse);
+                        throw new Error("AI 返回的不是有效的 JSON 格式或缺少必要字段（contacts, chats）");
                     }
                 } else {
                     throw new Error("AI 未返回任何内容");
                 }
             } catch (error) {
                 console.error("生成微信数据失败:", error);
-                showMessageBox(`微信数据加载失败: ${error.message}`);
+                showMessageBox(`微信数据加载失败: ${error.message}\n\n请检查浏览器控制台查看详细信息。`);
                 currentWeChatData = { contacts: [], chats: {} };
                 saveCharacterAppData(characterId, 'WeChat', currentWeChatData);
             }
@@ -19401,6 +19454,18 @@ JSON 格式：
                 return `${senderName}: ${msg.content}`;
             }).join('\n');
 
+            // 如果是和用户的聊天，额外调取主对话框的最近聊天记录
+            let mainChatHistoryText = '';
+            if (contactId === 'user') {
+                const mainChatHistory = context.chatHistory || [];
+                if (mainChatHistory.length > 0) {
+                    mainChatHistoryText = mainChatHistory.slice(-20).map(msg => {
+                        const senderName = msg.sender === 'user' ? userName : character.name;
+                        return `${senderName}: ${msg.content}`;
+                    }).join('\n');
+                }
+            }
+
             const systemPrompt = `
 身份：你是一个聊天记录生成器。现在需要生成角色【${character.name}】和【${contact.name}】之间接下来的5-10条对话。
 任务：模拟这两个人的自然对话，生成他们之间一段完整的互动场景。
@@ -19432,8 +19497,9 @@ JSON 格式示例：
 
 上下文信息：
 [当前时间]: ${new Date().toLocaleString()}
-[最近的聊天记录]:
-${historyText || '（还没有聊天记录，请主动开启话题）'}
+[微信内的聊天记录]:
+${historyText || '（微信内还没有聊天记录）'}
+${mainChatHistoryText ? `\n[主对话框的最近聊天(与${userName})]: \n${mainChatHistoryText}` : ''}
 
 [角色记忆]: ${context.memoryContext || '无'}
 [世界设定]: ${context.worldBookContext || '无'}
@@ -19461,34 +19527,83 @@ ${historyText || '（还没有聊天记录，请主动开启话题）'}
                 }
 
                 if (aiResponse) {
+                    console.log("AI 原始返回内容:", aiResponse);
+                    
+                    let jsonData = null;
+                    
+                    // 尝试方法1: 匹配 ```json ... ```
                     const jsonMatch = aiResponse.match(/```json([\s\S]*?)```/);
                     if (jsonMatch) {
-                        const result = JSON.parse(jsonMatch[1]);
-                        
-                        if (result.messages && Array.isArray(result.messages)) {
-                            // 添加新消息到聊天记录
-                            result.messages.forEach(msg => {
-                                if (!currentWeChatData.chats[contactId]) {
-                                    currentWeChatData.chats[contactId] = [];
-                                }
-                                currentWeChatData.chats[contactId].push(msg);
-                                
-                                // 立即在界面上显示（sender为"ai"是角色，"other"是联系人）
-                                const bubble = document.createElement('div');
-                                bubble.className = `chat-bubble ${msg.sender === 'ai' ? 'sender' : 'receiver'}`;
-                                bubble.textContent = msg.content;
-                                chatDetailContent.appendChild(bubble);
-                            });
-
-                            // 保存更新后的数据
-                            saveCharacterAppData(characterId, 'WeChat', currentWeChatData);
-                            console.log('新消息已生成并保存:', result.messages);
-
-                            // 滚动到底部
-                            setTimeout(() => chatDetailContent.scrollTop = chatDetailContent.scrollHeight, 50);
+                        try {
+                            jsonData = JSON.parse(jsonMatch[1].trim());
+                            console.log("成功解析 JSON (方法1)");
+                        } catch (e) {
+                            console.warn("方法1解析失败:", e.message);
                         }
+                    }
+                    
+                    // 尝试方法2: 匹配 ``` ... ``` (不带json标记)
+                    if (!jsonData) {
+                        const codeMatch = aiResponse.match(/```([\s\S]*?)```/);
+                        if (codeMatch) {
+                            try {
+                                jsonData = JSON.parse(codeMatch[1].trim());
+                                console.log("成功解析 JSON (方法2)");
+                            } catch (e) {
+                                console.warn("方法2解析失败:", e.message);
+                            }
+                        }
+                    }
+                    
+                    // 尝试方法3: 直接解析整个返回内容
+                    if (!jsonData) {
+                        try {
+                            jsonData = JSON.parse(aiResponse.trim());
+                            console.log("成功解析 JSON (方法3)");
+                        } catch (e) {
+                            console.warn("方法3解析失败:", e.message);
+                        }
+                    }
+                    
+                    // 尝试方法4: 查找第一个 { 到最后一个 }
+                    if (!jsonData) {
+                        const firstBrace = aiResponse.indexOf('{');
+                        const lastBrace = aiResponse.lastIndexOf('}');
+                        if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+                            try {
+                                const jsonStr = aiResponse.substring(firstBrace, lastBrace + 1);
+                                jsonData = JSON.parse(jsonStr);
+                                console.log("成功解析 JSON (方法4)");
+                            } catch (e) {
+                                console.warn("方法4解析失败:", e.message);
+                            }
+                        }
+                    }
+                    
+                    if (jsonData && jsonData.messages && Array.isArray(jsonData.messages)) {
+                        // 添加新消息到聊天记录
+                        jsonData.messages.forEach(msg => {
+                            if (!currentWeChatData.chats[contactId]) {
+                                currentWeChatData.chats[contactId] = [];
+                            }
+                            currentWeChatData.chats[contactId].push(msg);
+                            
+                            // 立即在界面上显示（sender为"ai"是角色，"other"是联系人）
+                            const bubble = document.createElement('div');
+                            bubble.className = `chat-bubble ${msg.sender === 'ai' ? 'sender' : 'receiver'}`;
+                            bubble.textContent = msg.content;
+                            chatDetailContent.appendChild(bubble);
+                        });
+
+                        // 保存更新后的数据
+                        saveCharacterAppData(characterId, 'WeChat', currentWeChatData);
+                        console.log('新消息已生成并保存:', jsonData.messages);
+
+                        // 滚动到底部
+                        setTimeout(() => chatDetailContent.scrollTop = chatDetailContent.scrollHeight, 50);
                     } else {
-                        throw new Error("AI 返回的不是有效的 JSON 格式");
+                        console.error("AI返回内容:", aiResponse);
+                        throw new Error("AI 返回的不是有效的 JSON 格式或缺少 messages 字段");
                     }
                 } else {
                     throw new Error("AI 未返回任何内容");
@@ -36384,6 +36499,10 @@ function addNewEventListeners() {
                         if (wallpaperBlob) {
                             const objectURL = URL.createObjectURL(wallpaperBlob);
                             wallpaperEl.style.backgroundImage = `url(${objectURL})`;
+                            
+                            // 自定义壁纸不应用滤镜
+                            wallpaperEl.style.filter = "none";
+                            
                             console.log(`Loaded custom wallpaper for character ${characterId}`);
                         }
                     } catch (error) {
@@ -47461,6 +47580,21 @@ ${wordGuessState.isFirstClue ?
             if (savedTheme === 'light') {
                 phoneScreen.classList.add('light-theme');
             }
+            
+            // 检查是否有自定义壁纸，只有默认壁纸才应用滤镜
+            const currentCharacterId = window.currentCharacterId || loadData('selectedCharacterId');
+            const hasCustomWallpaper = currentCharacterId && loadData(`char_wallpaper_${currentCharacterId}`);
+            
+            if (!hasCustomWallpaper) {
+                const wallpaperEl = document.getElementById('char-phone-wallpaper');
+                if (wallpaperEl) {
+                    if (savedTheme === 'light') {
+                        wallpaperEl.style.filter = "grayscale(0%) brightness(1.1)";
+                    } else {
+                        wallpaperEl.style.filter = "grayscale(100%)";
+                    }
+                }
+            }
 
             // 点击状态栏右侧的太阳/月亮图标切换主题
             statusBar.addEventListener('click', (e) => {
@@ -47487,16 +47621,68 @@ ${wordGuessState.isFirstClue ?
 
             const isLightTheme = phoneScreen.classList.contains('light-theme');
             
+            // 检查是否有自定义壁纸
+            const currentCharacterId = window.currentCharacterId || loadData('selectedCharacterId');
+            const hasCustomWallpaper = currentCharacterId && loadData(`char_wallpaper_${currentCharacterId}`);
+            
             if (isLightTheme) {
                 // 切换到黑夜模式
                 phoneScreen.classList.remove('light-theme');
                 localStorage.setItem('characterPhoneTheme', 'dark');
                 console.log('已切换到黑夜模式');
+                
+                // 只有默认壁纸才更新滤镜
+                if (!hasCustomWallpaper) {
+                    const wallpaperEl = document.getElementById('char-phone-wallpaper');
+                    if (wallpaperEl) {
+                        wallpaperEl.style.filter = "grayscale(100%)";
+                    }
+                }
             } else {
                 // 切换到白天模式
                 phoneScreen.classList.add('light-theme');
                 localStorage.setItem('characterPhoneTheme', 'light');
                 console.log('已切换到白天模式');
+                
+                // 只有默认壁纸才更新滤镜
+                if (!hasCustomWallpaper) {
+                    const wallpaperEl = document.getElementById('char-phone-wallpaper');
+                    if (wallpaperEl) {
+                        wallpaperEl.style.filter = "grayscale(0%) brightness(1.1)";
+                    }
+                }
+            }
+            
+            // 如果"不要点开"App已经打开，刷新其内容以更新文字颜色
+            const detailView = document.getElementById('char-phone-app-detail-view');
+            const titleEl = document.getElementById('char-phone-app-title');
+            const listContainer = document.getElementById('char-phone-app-content-list');
+            
+            if (detailView && detailView.style.display === 'flex' && 
+                titleEl && titleEl.textContent === '不要点开' && 
+                listContainer) {
+                
+                // 更新文字颜色：日间模式用黑色，夜间模式用白色
+                const newTextColor = isLightTheme ? 'text-gray-900' : 'text-white';
+                const oldTextColor = isLightTheme ? 'text-white' : 'text-gray-900';
+                
+                // 替换所有文字颜色类
+                const allElements = listContainer.querySelectorAll('*');
+                allElements.forEach(el => {
+                    if (el.classList.contains(oldTextColor)) {
+                        el.classList.remove(oldTextColor);
+                        el.classList.add(newTextColor);
+                    }
+                });
+                
+                // 也更新根容器的颜色
+                if (listContainer.querySelector('.p-4')) {
+                    const container = listContainer.querySelector('.p-4');
+                    if (container.classList.contains(oldTextColor)) {
+                        container.classList.remove(oldTextColor);
+                        container.classList.add(newTextColor);
+                    }
+                }
             }
         }
 
