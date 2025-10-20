@@ -12812,6 +12812,23 @@
             border-radius: 2.5rem;
         }
 
+        /* ====== 【【请在这里添加新代码】】 ====== */
+        /* * 修复：Dock栏图标垂直居中
+         * 移除图标图片(app-icon-img)的底部外边距(margin-bottom)，
+         * 这样它才能在它的容器(app-icon)中完美居中。
+         */
+        #character-phone-screen .dock .app-icon .app-icon-img {
+            margin: 0 !important; 
+        }
+        
+        /* 确保 dock 栏中的图标容器也正确居中 */
+        #character-phone-screen .dock .app-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        /* ====== 【【添加代码结束】】 ====== */
+
         #character-phone-screen #char-phone-wallpaper {
             background-image: url('https://images.unsplash.com/photo-1505909182942-e2f09aee3e89?q=80&w=2147&auto=format&fit=crop');
             background-size: cover;
@@ -12858,7 +12875,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 0.2rem auto;
+            margin: 0 auto;
         }
         
         #character-phone-screen .app-icon-img i {
@@ -12885,7 +12902,7 @@
         /* 2. 修复：为角色手机的 Dock 栏添加绝对定位和居中 */
         #character-phone-screen .dock {
             position: absolute;
-            bottom: 0.5rem;
+            bottom: 0.2rem;
             left: 50%;
             transform: translateX(-50%);
             width: 95%;
@@ -16049,7 +16066,7 @@
                     </div>
 
                     <div class="dock z-30 mb-2">
-                        <div class="grid grid-cols-3 justify-items-center">
+                        <div class="grid grid-cols-3 justify-items-center items-center">
                             <div class="app-icon" data-char-app="微信">
                                 <div class="app-icon-img">
                                     <i class="fab fa-weixin text-white"></i>
@@ -18372,7 +18389,7 @@ function getChatBackgroundElement() {
                     break;
                 case 'Browser':
                     systemPrompt += `
-[{"id": "search_1", "query": "搜索关键词", "title": "相关文章标题", "preview": "文章预览 (100字左右)", "fullContent": "模拟的完整文章内容(300-500字)"}]`;
+[{"id": "search_1", "query": "搜索关键词", "title": "相关文章标题", "preview": "文章预览 (100-150字左右)"}]`;
                     break;
                 case 'Contacts':
                     systemPrompt += `
@@ -18447,10 +18464,13 @@ function getChatBackgroundElement() {
                 const itemEl = document.createElement('div');
                 itemEl.className = 'list-item';
                 // 只显示主要的几个字段作为预览
+                const previewText = item.preview ? item.preview.substring(0, 50) : 
+                                   item.content ? item.content.substring(0, 50) :
+                                   item.reason || item.time || '';
                 itemEl.innerHTML = `
                     <div class="list-item-content">
                         <div class="list-item-title">${item.title || item.name || item.location || item.query || '未知项目'}</div>
-                        <div class="list-item-preview">${(item.preview || item.content?.substring(0,50) || item.reason || item.time || '') + '...'}</div>
+                        <div class="list-item-preview">${previewText}${previewText ? '...' : ''}</div>
                     </div>
                     <div>
                         <button class="edit-item-btn text-blue-400 mr-2" data-id="${item.id}" data-app="${appName}"><i class="ri-edit-line"></i></button>
@@ -18704,9 +18724,10 @@ function getChatBackgroundElement() {
                 `;
                 itemEl.addEventListener('click', (e) => {
                     if (!e.target.closest('button')) {
-                        const formattedContent = formatAITextContent(item.fullContent || item.preview || '无内容');
+                        const formattedContent = formatAITextContent(item.preview || '无内容');
                         const browserContent = `
                             <p><strong>${item.title || '未知网页'}</strong></p>
+                            ${item.query ? `<p style="margin-top: 0.5rem; color: #888; font-size: 0.9em;">搜索: ${item.query}</p>` : ''}
                             <div style="margin-top: 1rem;">${formattedContent}</div>
                         `;
                         showCharacterPhoneAlert('浏览历史详情', browserContent);
@@ -18715,6 +18736,11 @@ function getChatBackgroundElement() {
                 listContainer.appendChild(itemEl);
             });
             setupListItemActions(characterId);
+        }
+
+        // 为浏览器创建别名函数，使其与刷新逻辑兼容
+        function renderBrowserList(characterId, data = null) {
+            renderBrowserHistoryList(characterId, data);
         }
 
         // 渲染通讯录列表
