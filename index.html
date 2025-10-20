@@ -36362,13 +36362,13 @@ function addNewEventListeners() {
                 console.log('Loaded cached phone data:', cachedData);
             } else {
                 // 没有缓存，显示默认提示
-                if (locationEl) locationEl.textContent = '点击右上角刷新';
+                if (locationEl) locationEl.textContent = '点击顶部按钮刷新';
                 
             if (memoList) {
                 memoList.innerHTML = `
                     <div class="memo-line">
                             <span class="memo-icon">☆</span>
-                            <span class="memo-text">点击右上角刷新查看备忘录</span>
+                            <span class="memo-text">点击顶部按钮刷新查看备忘录</span>
                     </div>
                 `;
                 }
@@ -40175,7 +40175,7 @@ ${recentMessages.map(m => `${m.sender === 'user' ? userName : character.name}: $
                     - **指定情绪**: 使用 [STICKER: 关键词] 指令（如 [STICKER: 开心]、[STICKER: 害羞]、[STICKER: 哭]、[STICKER: 笑]），程序会根据关键词匹配对应情绪的表情
                     - **使用场景**: 
                       * 表达强烈情绪时（开心、生气、害羞、哭、笑、爱等）
-                      * 回应用户的玩笑或调侃
+                      * 回应用户的玩笑或调侃时，【鼓励】使用表情包让互动更有趣。
                       * 想要增加对话趣味性时
                     - **重要**: 
                       * 表情指令必须作为独立的一段，用 ||| 与其他文字分隔
