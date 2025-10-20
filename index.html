@@ -606,17 +606,14 @@
             animation: spin 12s linear infinite;
         }
         /* 接收按钮动画 - 极简优雅版 */
-        /* 邮件发送图标闪烁动画 - 保持图标不变，只改变显示效果 */
-        @keyframes mail-send-flash {
-            0% { opacity: 1; filter: brightness(1); }
-            25% { opacity: 0.6; filter: brightness(0.8); }
-            50% { opacity: 1; filter: brightness(1.2); }
-            75% { opacity: 0.6; filter: brightness(0.8); }
-            100% { opacity: 1; filter: brightness(1); }
+        /* 刷新按钮旋转动画 - 顺时针旋转 */
+        @keyframes spin-clockwise {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
         
         .spinning {
-            animation: mail-send-flash 1.2s ease-in-out infinite;
+            animation: spin-clockwise 1s linear infinite;
         }
         
         /* --- 未读消息红点样式 --- */
@@ -9603,6 +9600,17 @@
             max-width: 600px;
         }
         
+        /* 确保主Dock栏层级合理，不会遮挡其他界面 */
+        #main-dock {
+            z-index: 1;
+            pointer-events: auto;
+        }
+        
+        /* 当主Dock隐藏时，确保它完全不影响布局 */
+        #main-dock[style*="display: none"] {
+            pointer-events: none;
+        }
+        
         /* 新增：确保在真正的移动设备上标题栏始终可见 */
         @media (max-width: 768px) and (pointer: coarse) {
             body:not(.fullscreen-active) .app-header:not(.hidden) {
@@ -12791,6 +12799,1051 @@
         }
         /* ====== "正在输入..."提示样式 END ====== */
 
+        /* ======================================= */
+        /* ====== 角色手机界面专属样式 START ====== */
+        /* ======================================= */
+
+        #character-phone-screen {
+            padding-top: 0 !important;
+        }
+
+        #character-phone-screen #character-phone-display-content {
+            background-color: #000;
+            border-radius: 2.5rem;
+        }
+
+        #character-phone-screen #char-phone-wallpaper {
+            background-image: url('https://images.unsplash.com/photo-1505909182942-e2f09aee3e89?q=80&w=2147&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            transition: background-image 0.5s ease-in-out;
+            filter: grayscale(100%);
+        }
+
+        #character-phone-screen #char-phone-status-bar {
+            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            z-index: 50;
+        }
+
+        #character-phone-screen .app-icon {
+            cursor: pointer;
+            transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        
+        #character-phone-screen .app-icon:hover {
+            transform: scale(1.05);
+        }
+        
+        #character-phone-screen .app-icon:hover .app-icon-img {
+            background: rgba(255, 255, 255, 0.12); /* hover时增加不透明度 */
+            box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.4),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+        }
+        
+        #character-phone-screen .app-icon:active {
+            transform: scale(0.95);
+        }
+
+        #character-phone-screen .app-icon-img {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.08); /* 半透明白色，更好的玻璃感 */
+            backdrop-filter: blur(15px) saturate(180%);
+            -webkit-backdrop-filter: blur(15px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.15); /* 稍微加强边框 */
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.35),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.1); /* 添加内部高光 */
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 0.2rem auto;
+        }
+        
+        #character-phone-screen .app-icon-img i {
+            font-size: 1.75rem;
+        }
+
+        #character-phone-screen .app-label {
+            font-size: 12px;
+            font-weight: 500;
+            color: white;
+            text-align: center;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        /* ======================================= */
+        /* ====== 角色手机界面 修复与新增 START ====== */
+        /* ======================================= */
+
+        /* 1. 修复：移除 app-screen-view 带来的顶部内边距，防止主状态栏重叠 */
+        #character-phone-screen {
+            padding-top: 0 !important;
+        }
+
+        /* 2. 修复：为角色手机的 Dock 栏添加绝对定位和居中 */
+        #character-phone-screen .dock {
+            position: absolute;
+            bottom: 0.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 95%;
+            max-width: 380px;
+            backdrop-filter: blur(25px) saturate(180%);
+            -webkit-backdrop-filter: blur(25px) saturate(180%);
+            background-color: rgba(20, 20, 20, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 1.75rem;
+            padding: 0.5rem 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            z-index: 30;
+        }
+
+        /* 3. 新增：新返回按钮的毛玻璃样式 */
+        #character-phone-screen #char-phone-exit-btn {
+            backdrop-filter: blur(15px) saturate(180%);
+            -webkit-backdrop-filter: blur(15px) saturate(180%);
+            background-color: rgba(128, 128, 128, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.2s, transform 0.2s;
+        }
+        #character-phone-screen #char-phone-exit-btn:hover {
+            transform: translate(-50%, 0) scale(1.1);
+            background-color: rgba(128, 128, 128, 0.5);
+        }
+        #character-phone-screen #char-phone-exit-btn:active {
+            transform: translate(-50%, 0) scale(0.95);
+        }
+
+        #character-phone-screen .widget-container {
+            background-color: rgba(20, 20, 20, 0.15);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.25);
+            border-radius: 1.5rem;
+            padding: 0.5rem 1rem;
+        }
+
+        /* 4. 修复：确保角色头像 Widget 内部的图标/图片居中 */
+        #character-phone-screen .widget-avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            color: white;
+            overflow: hidden;
+        }
+        #character-phone-screen .widget-avatar i {
+            font-size: 2.5rem;
+        }
+        #character-phone-screen .widget-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* ======================================= */
+        /* ====== 角色手机界面 修复与新增 END ====== */
+        /* ======================================= */
+        
+        #character-phone-screen .widget-info {
+            color: white;
+        }
+
+        #character-phone-screen .widget-name {
+            font-weight: 600;
+            font-size: 1rem;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+
+        #character-phone-screen .widget-location {
+            font-size: 0.875rem;
+            opacity: 0.8;
+            display: flex;
+            align-items: center;
+            margin-top: 0.25rem;
+        }
+
+        #character-phone-screen .widget-location span {
+            margin-left: 0.25rem;
+        }
+
+        #character-phone-screen #char-phone-message-box {
+            transition: opacity 0.3s, transform 0.3s;
+            z-index: 100;
+        }
+
+        #character-phone-screen .widget-chat-bubble {
+            background-color: rgba(20, 20, 20, 0.3);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1.5rem;
+            padding: 0.5rem 1rem;
+            color: white;
+            font-size: 13px;
+            line-height: 1.4;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            width: fit-content;
+            max-width: 95%;
+            margin-top: 0.1rem;
+            margin-bottom: 0.1rem;
+        }
+
+        #character-phone-screen .memo-widget {
+            font-family: sans-serif;
+        }
+        
+        #character-phone-screen .memo-widget .memo-line {
+            display: flex;
+            align-items: center;
+            padding: 2px 0;
+        }
+        
+        #character-phone-screen .memo-widget .memo-separator {
+            border-top: 1px dashed rgba(255, 255, 255, 0.2);
+            margin: 8px 0;
+        }
+        
+        #character-phone-screen .memo-widget .memo-icon {
+            margin-right: 8px;
+            font-size: 1em;
+            opacity: 0.8;
+        }
+        
+        #character-phone-screen .memo-widget .memo-text {
+            color: white;
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        /* ======================================= */
+        /* ====== 角色手机界面专属样式 END ====== */
+        /* ======================================= */
+
+        /* =================================== */
+        /* ==   角色手机 - 新增 App 界面样式    == */
+        /* =================================== */
+
+        /* App 详情页 基础布局 */
+        #character-phone-screen .app-detail-view {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #111; /* 深色背景，代替壁纸 */
+            display: none; /* 默认隐藏 */
+            flex-direction: column;
+            /* 确保它在角色手机的 Z-index(30) 之上 */
+            z-index: 40; 
+        }
+
+        /* App 头部 (标题栏) */
+        #character-phone-screen .app-header {
+            padding-top: 5.75rem; /* 92px, 适配状态栏 (状态栏高度约46-48px) */
+            padding-bottom: 1.25rem; /* 20px */
+            padding-left: 1rem;
+            padding-right: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: rgba(30, 30, 30, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            flex-shrink: 0;
+            position: relative;
+        }
+        #character-phone-screen .app-title {
+            color: white;
+            font-weight: 600;
+            font-size: 1rem; /* 16px */
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+        }
+        #character-phone-screen .app-nav-btn {
+            color: #3B82F6; /* 蓝色，模仿iOS */
+            font-size: 1.5rem; /* 24px */
+            width: 2.5rem; /* 40px */
+            height: 2.5rem; /* 40px */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #character-phone-screen .app-nav-btn:active {
+            opacity: 0.5;
+        }
+
+        /* App 内容列表 */
+        #character-phone-screen .app-content-list {
+            flex-grow: 1;
+            overflow-y: auto;
+            color: white;
+        }
+
+        /* 通用列表项 (梦日记, 浏览器等) */
+        #character-phone-screen .list-item {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start; /* 改为顶部对齐，适应多行文字 */
+        }
+        #character-phone-screen .list-item-content {
+            flex-grow: 1;
+            margin-right: 1rem;
+            min-width: 0; /* 允许flex子元素缩小 */
+        }
+        #character-phone-screen .list-item-title {
+            font-weight: 500;
+            color: white;
+            font-size: 0.95rem;
+            word-wrap: break-word; /* 自动换行 */
+            word-break: break-word; /* 长单词也换行 */
+            white-space: normal; /* 允许换行 */
+        }
+        #character-phone-screen .list-item-preview {
+            font-size: 0.8rem;
+            color: #9CA3AF; /* gray-400 */
+            margin-top: 0.25rem;
+            word-wrap: break-word; /* 自动换行 */
+            word-break: break-word; /* 长单词也换行 */
+            white-space: normal; /* 允许换行 */
+            line-height: 1.4; /* 增加行高，提升可读性 */
+        }
+        #character-phone-screen .list-item-delete {
+            background-color: #EF4444; /* red-500 */
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 2rem;
+            height: 2rem;
+            font-size: 1rem;
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+        
+        /* 微信联系人列表项 */
+        #character-phone-screen .wechat-contact-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+        }
+        #character-phone-screen .wechat-contact-item:active {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        #character-phone-screen .wechat-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            margin-right: 0.75rem;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #333; /* 匿名灰色 */
+            font-size: 1.5rem;
+        }
+        #character-phone-screen .wechat-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        #character-phone-screen .wechat-contact-info {
+            flex-grow: 1;
+            overflow: hidden;
+        }
+        #character-phone-screen .wechat-contact-name {
+            font-weight: 500;
+            color: white;
+        }
+        #character-phone-screen .wechat-latest-msg {
+            font-size: 0.85rem;
+            color: #9CA3AF;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        /* 聊天气泡 */
+        #character-phone-screen #char-phone-chat-content-area {
+            display: flex;
+            flex-direction: column;
+        }
+        #character-phone-screen .chat-bubble {
+            padding: 0.5rem 0.75rem;
+            border-radius: 1.25rem;
+            max-width: 75%;
+            word-wrap: break-word;
+            line-height: 1.4;
+        }
+        #character-phone-screen .chat-bubble.sender {
+            background-color: #3B82F6; /* 蓝色 */
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 0.25rem;
+            margin-right: 0.75rem; /* 增加右边距 */
+            margin-left: auto;
+        }
+        #character-phone-screen .chat-bubble.receiver {
+            background-color: #374151; /* gray-700 */
+            color: white;
+            align-self: flex-start;
+            border-bottom-left-radius: 0.25rem;
+            margin-left: 0.75rem; /* 增加左边距 */
+            margin-right: auto;
+        }
+
+        /* ======================================= */
+        /* ====== 角色手机界面专属样式 END ====== */
+        /* ======================================= */
+
+        /* =================================== */
+        /* ==   角色手机 - iOS 风格主题系统    == */
+        /* =================================== */
+
+        /* 添加主题切换按钮到状态栏 */
+        #character-phone-screen #char-phone-status-bar::after {
+            content: '☀️';
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+            cursor: pointer;
+            z-index: 60;
+            padding: 0.25rem;
+            transition: opacity 0.3s;
+        }
+
+        #character-phone-screen.light-theme #char-phone-status-bar::after {
+            content: '🌙';
+        }
+
+        /* === 白天模式（Light Theme）- iOS 白蓝风格 === */
+        #character-phone-screen.light-theme .app-detail-view {
+            background-color: #F2F2F7; /* iOS 浅灰背景 */
+        }
+
+        #character-phone-screen.light-theme .app-header {
+            background-color: rgba(255, 255, 255, 0.85);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        #character-phone-screen.light-theme .app-title {
+            color: #000000;
+        }
+
+        #character-phone-screen.light-theme .app-nav-btn {
+            color: #007AFF; /* iOS 蓝色 */
+        }
+
+        #character-phone-screen.light-theme .app-content-list {
+            color: #000000;
+        }
+
+        /* 列表项 - 白天模式 */
+        #character-phone-screen.light-theme .list-item {
+            background-color: #FFFFFF;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            margin-bottom: 0;
+        }
+
+        #character-phone-screen.light-theme .list-item:active {
+            background-color: #E5E5EA;
+        }
+
+        #character-phone-screen.light-theme .list-item-title {
+            color: #000000;
+        }
+
+        #character-phone-screen.light-theme .list-item-preview {
+            color: #8E8E93; /* iOS 灰色文字 */
+        }
+
+        #character-phone-screen.light-theme .list-item-delete {
+            background-color: #FF3B30; /* iOS 红色 */
+        }
+
+        /* 微信联系人 - 白天模式 */
+        #character-phone-screen.light-theme .wechat-contact-item {
+            background-color: #FFFFFF;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        #character-phone-screen.light-theme .wechat-contact-item:active {
+            background-color: #E5E5EA;
+        }
+
+        #character-phone-screen.light-theme .wechat-avatar {
+            background-color: #E5E5EA;
+        }
+
+        #character-phone-screen.light-theme .wechat-contact-name {
+            color: #000000;
+        }
+
+        #character-phone-screen.light-theme .wechat-latest-msg {
+            color: #8E8E93;
+        }
+
+        /* 聊天气泡 - 白天模式 */
+        #character-phone-screen.light-theme .chat-bubble.sender {
+            background-color: #007AFF; /* iOS 蓝色 */
+            color: white;
+        }
+
+        #character-phone-screen.light-theme .chat-bubble.receiver {
+            background-color: #E5E5EA; /* iOS 浅灰 */
+            color: #000000;
+        }
+
+        /* === 黑夜模式（Dark Theme）- iOS 黑蓝风格 === */
+        /* 默认已经是黑夜模式，这里做一些优化 */
+        #character-phone-screen .app-detail-view {
+            background-color: #000000; /* 纯黑背景 */
+        }
+
+        #character-phone-screen .app-header {
+            background-color: rgba(28, 28, 30, 0.85); /* iOS 深色背景 */
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        #character-phone-screen .app-nav-btn {
+            color: #0A84FF; /* iOS 深色模式蓝色 */
+        }
+
+        /* 列表项 - 黑夜模式优化 */
+        #character-phone-screen .list-item {
+            background-color: #1C1C1E; /* iOS 深色卡片背景 */
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 1px;
+        }
+
+        #character-phone-screen .list-item:active {
+            background-color: #2C2C2E;
+        }
+
+        #character-phone-screen .list-item-preview {
+            color: #8E8E93;
+        }
+
+        #character-phone-screen .list-item-delete {
+            background-color: #FF453A; /* iOS 深色模式红色 */
+        }
+
+        /* 微信联系人 - 黑夜模式优化 */
+        #character-phone-screen .wechat-contact-item {
+            background-color: #1C1C1E;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        #character-phone-screen .wechat-contact-item:active {
+            background-color: #2C2C2E;
+        }
+
+        #character-phone-screen .wechat-avatar {
+            background-color: #3A3A3C;
+        }
+
+        #character-phone-screen .wechat-latest-msg {
+            color: #8E8E93;
+        }
+
+        /* 聊天气泡 - 黑夜模式优化 */
+        #character-phone-screen .chat-bubble.sender {
+            background-color: #0A84FF; /* iOS 深色模式蓝色 */
+        }
+
+        #character-phone-screen .chat-bubble.receiver {
+            background-color: #2C2C2E; /* iOS 深色灰 */
+        }
+
+        /* === iOS 风格弹窗美化 === */
+        /* 改进角色手机内的所有弹窗样式 */
+        #character-phone-screen .modal-overlay {
+            position: absolute;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 1rem;
+        }
+
+        #character-phone-screen .modal-overlay.visible {
+            display: flex;
+        }
+
+        #character-phone-screen .modal-content {
+            background-color: rgba(28, 28, 30, 0.98);
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+            border-radius: 1.25rem;
+            padding: 0;
+            max-width: 340px;
+            width: 92%;
+            max-height: 85vh;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            animation: modalSlideUp 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        @keyframes modalSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* 白天模式弹窗 */
+        #character-phone-screen.light-theme .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.3);
+        }
+
+        #character-phone-screen.light-theme .modal-content {
+            background-color: rgba(255, 255, 255, 0.98);
+            color: #000000;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        /* 弹窗头部区域 */
+        #character-phone-screen .modal-content-header {
+            padding: 1.25rem 1.5rem 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            flex-shrink: 0;
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        #character-phone-screen.light-theme .modal-content-header {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            background: rgba(0, 0, 0, 0.02);
+        }
+
+        /* 弹窗标题 */
+        #character-phone-screen .modal-content h3,
+        #character-phone-screen .modal-content-header h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin: 0;
+            text-align: center;
+            color: white;
+        }
+
+        #character-phone-screen.light-theme .modal-content h3,
+        #character-phone-screen.light-theme .modal-content-header h3 {
+            color: #000000;
+        }
+
+        /* 弹窗主体内容区域 - 可滚动 */
+        #character-phone-screen .modal-content-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+            line-height: 1.65;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* 美化滚动条 */
+        #character-phone-screen .modal-content-body::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        #character-phone-screen .modal-content-body::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        #character-phone-screen .modal-content-body::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+        }
+
+        #character-phone-screen.light-theme .modal-content-body::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        /* 弹窗内的段落样式 */
+        #character-phone-screen .modal-content-body p {
+            margin: 0 0 0.5rem 0;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.9375rem;
+            word-wrap: break-word;
+            word-break: break-word;
+        }
+
+        #character-phone-screen .modal-content-body p:last-child {
+            margin-bottom: 0;
+        }
+
+        #character-phone-screen.light-theme .modal-content-body p {
+            color: rgba(0, 0, 0, 0.85);
+        }
+
+        #character-phone-screen .modal-content-body strong {
+            font-weight: 600;
+            color: rgba(255, 255, 255, 1);
+        }
+
+        #character-phone-screen.light-theme .modal-content-body strong {
+            color: rgba(0, 0, 0, 0.95);
+        }
+
+        /* 弹窗底部按钮区域 */
+        #character-phone-screen .modal-content-footer {
+            padding: 1rem 1.5rem 1.25rem;
+            flex-shrink: 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        #character-phone-screen.light-theme .modal-content-footer {
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            background: rgba(0, 0, 0, 0.02);
+        }
+
+        /* 弹窗输入框 */
+        #character-phone-screen .modal-content input,
+        #character-phone-screen .modal-content textarea,
+        #character-phone-screen .modal-content-body input,
+        #character-phone-screen .modal-content-body textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 0.625rem;
+            border: none;
+            background-color: rgba(118, 118, 128, 0.24);
+            color: white;
+            font-size: 0.9375rem;
+            margin-bottom: 0.75rem;
+            box-sizing: border-box;
+        }
+
+        #character-phone-screen.light-theme .modal-content input,
+        #character-phone-screen.light-theme .modal-content textarea,
+        #character-phone-screen.light-theme .modal-content-body input,
+        #character-phone-screen.light-theme .modal-content-body textarea {
+            background-color: #F2F2F7;
+            color: #000000;
+        }
+
+        #character-phone-screen .modal-content input::placeholder,
+        #character-phone-screen .modal-content textarea::placeholder,
+        #character-phone-screen .modal-content-body input::placeholder,
+        #character-phone-screen .modal-content-body textarea::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        #character-phone-screen.light-theme .modal-content input::placeholder,
+        #character-phone-screen.light-theme .modal-content textarea::placeholder,
+        #character-phone-screen.light-theme .modal-content-body input::placeholder,
+        #character-phone-screen.light-theme .modal-content-body textarea::placeholder {
+            color: #8E8E93;
+        }
+
+        /* 弹窗按钮 */
+        #character-phone-screen .modal-content button,
+        #character-phone-screen .modal-content-footer button {
+            width: 100%;
+            padding: 0.875rem;
+            border-radius: 0.75rem;
+            border: none;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-top: 0;
+            box-sizing: border-box;
+        }
+
+        #character-phone-screen .modal-content button:active,
+        #character-phone-screen .modal-content-footer button:active {
+            opacity: 0.6;
+            transform: scale(0.98);
+        }
+
+        /* 兼容旧版：如果弹窗有直接的 padding，保持按钮间距 */
+        #character-phone-screen .modal-content:not(:has(.modal-content-body)) button {
+            margin-top: 0.5rem;
+        }
+
+        #character-phone-screen .modal-content:not(:has(.modal-content-body)) {
+            padding: 1.5rem;
+        }
+
+        /* 新版弹窗：按钮之间的间距 */
+        #character-phone-screen .modal-content-footer button + button {
+            margin-top: 0.625rem;
+        }
+
+        /* 主要按钮（确认、保存等） */
+        #character-phone-screen .modal-content button.primary,
+        #character-phone-screen .modal-content button[onclick*="save"],
+        #character-phone-screen .modal-content button[onclick*="confirm"] {
+            background-color: #0A84FF;
+            color: white;
+        }
+
+        #character-phone-screen.light-theme .modal-content button.primary,
+        #character-phone-screen.light-theme .modal-content button[onclick*="save"],
+        #character-phone-screen.light-theme .modal-content button[onclick*="confirm"] {
+            background-color: #007AFF;
+        }
+
+        /* 次要按钮（取消等） */
+        #character-phone-screen .modal-content button.secondary,
+        #character-phone-screen .modal-content button[onclick*="close"],
+        #character-phone-screen .modal-content button[onclick*="cancel"] {
+            background-color: rgba(118, 118, 128, 0.24);
+            color: #0A84FF;
+        }
+
+        #character-phone-screen.light-theme .modal-content button.secondary,
+        #character-phone-screen.light-theme .modal-content button[onclick*="close"],
+        #character-phone-screen.light-theme .modal-content button[onclick*="cancel"] {
+            background-color: #F2F2F7;
+            color: #007AFF;
+        }
+
+        /* 危险按钮（删除等） */
+        #character-phone-screen .modal-content button.danger,
+        #character-phone-screen .modal-content button[onclick*="delete"] {
+            background-color: #FF453A;
+            color: white;
+        }
+
+        #character-phone-screen.light-theme .modal-content button.danger,
+        #character-phone-screen.light-theme .modal-content button[onclick*="delete"] {
+            background-color: #FF3B30;
+        }
+
+        /* 分组列表样式（iOS Settings 风格） */
+        #character-phone-screen .app-content-list {
+            padding: 1rem 0;
+        }
+
+        #character-phone-screen .list-item {
+            border-radius: 0;
+            margin: 0 1rem;
+        }
+
+        #character-phone-screen .list-item:first-child {
+            border-top-left-radius: 0.625rem;
+            border-top-right-radius: 0.625rem;
+        }
+
+        #character-phone-screen .list-item:last-child {
+            border-bottom-left-radius: 0.625rem;
+            border-bottom-right-radius: 0.625rem;
+            border-bottom: none;
+        }
+
+        /* 滚动条美化 */
+        #character-phone-screen .app-content-list::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        #character-phone-screen .app-content-list::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        #character-phone-screen .app-content-list::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+        }
+
+        #character-phone-screen.light-theme .app-content-list::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        /* 动画效果 */
+        #character-phone-screen .app-detail-view,
+        #character-phone-screen .app-header,
+        #character-phone-screen .list-item,
+        #character-phone-screen .wechat-contact-item,
+        #character-phone-screen .modal-content {
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+
+        /* === 特殊弹窗：列表项样式优化 === */
+        /* 用于痕迹、信件等列表展示的弹窗 */
+        #character-phone-screen .list-item-modal {
+            cursor: pointer;
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transition: background-color 0.2s;
+        }
+
+        #character-phone-screen .list-item-modal:last-child {
+            border-bottom: none;
+        }
+
+        #character-phone-screen .list-item-modal:active {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        #character-phone-screen.light-theme .list-item-modal {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        #character-phone-screen.light-theme .list-item-modal:active {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        #character-phone-screen .list-item-modal-title {
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+            color: white;
+        }
+
+        #character-phone-screen.light-theme .list-item-modal-title {
+            color: #000000;
+        }
+
+        #character-phone-screen .list-item-modal-subtitle {
+            font-size: 0.8125rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        #character-phone-screen.light-theme .list-item-modal-subtitle {
+            color: rgba(0, 0, 0, 0.6);
+        }
+
+        /* === 主屏幕壁纸和图标优化 === */
+        /* 白天模式的壁纸 */
+        #character-phone-screen.light-theme #char-phone-wallpaper {
+            background-image: url('https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=2147&auto=format&fit=crop');
+            filter: grayscale(0%) brightness(1.1);
+        }
+
+        /* 白天模式的状态栏 */
+        #character-phone-screen.light-theme #char-phone-status-bar {
+            color: #000000;
+            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
+        }
+
+        /* 白天模式的 App 图标标签 */
+        #character-phone-screen.light-theme .app-label {
+            color: #000000;
+            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+        }
+
+        /* 白天模式的主页图标背景优化 - 拟态玻璃效果 */
+        #character-phone-screen.light-theme .app-icon-img {
+            background: rgba(255, 255, 255, 0.3); /* 透明白色 */
+            backdrop-filter: blur(10px) saturate(180%);
+            -webkit-backdrop-filter: blur(10px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.5); /* 半透明白色边框 */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.6); /* 内部高光 */
+        }
+
+        #character-phone-screen.light-theme .app-icon-img:hover {
+            background: rgba(255, 255, 255, 0.4); /* hover时稍微增加不透明度 */
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.7);
+        }
+
+        /* 白天模式的图标颜色调整 */
+        #character-phone-screen.light-theme .app-icon-img i {
+            color: #1a1a1a; /* 深黑色 */
+        }
+
+        /* 特定应用图标颜色 */
+        #character-phone-screen.light-theme .app-icon[data-app="痕迹"] .app-icon-img i {
+            color: #FF9500; /* 橙色 */
+        }
+
+        #character-phone-screen.light-theme .app-icon[data-app="信件"] .app-icon-img i {
+            color: #34C759; /* 绿色 */
+        }
+
+        #character-phone-screen.light-theme .app-icon[data-app="通讯录"] .app-icon-img i {
+            color: #5856D6; /* 紫色 */
+        }
+
+        #character-phone-screen.light-theme .app-icon[data-app="设定"] .app-icon-img i {
+            color: #8E8E93; /* 灰色 */
+        }
+
+        /* Dock 栏白天模式优化 */
+        #character-phone-screen.light-theme .dock {
+            background-color: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        /* 输入区域白天模式 */
+        #character-phone-screen.light-theme #char-phone-input-area {
+            background-color: rgba(255, 255, 255, 0.85);
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        #character-phone-screen.light-theme #char-phone-chat-input {
+            background-color: #F2F2F7;
+            color: #000000;
+        }
+
+        #character-phone-screen.light-theme #char-phone-chat-input::placeholder {
+            color: #8E8E93;
+        }
+
+        #character-phone-screen.light-theme #char-phone-send-btn {
+            background-color: #007AFF;
+        }
+
+        /* 聊天内容区域白天模式 */
+        #character-phone-screen.light-theme #char-phone-chat-content-area {
+            background-color: #F2F2F7;
+        }
+
+        /* 时间戳样式 */
+        #character-phone-screen .chat-timestamp {
+            color: #8E8E93;
+            font-size: 0.75rem;
+            text-align: center;
+            margin: 0.5rem 0;
+        }
+
+        #character-phone-screen.light-theme .chat-timestamp {
+            color: #8E8E93;
+        }
+
+        /* 返回按钮白天模式 */
+        #character-phone-screen.light-theme #char-phone-exit-btn {
+            background-color: rgba(255, 255, 255, 0.4);
+        }
+
+        #character-phone-screen.light-theme #char-phone-exit-btn i {
+            color: #000000;
+        }
+
+        /* ======================================= */
+        /* ====== iOS 风格主题系统 END ====== */
+        /* ======================================= */
+
     </style>
 </head>
 <body class="dark-mode">
@@ -13212,7 +14265,7 @@
                 <div class="rounded-xl flex items-center justify-center shadow-lg app-icon app-icon-glass" data-app-name="GroupChat"><i class="ri-group-line text-white text-2xl"></i></div>
             </div>
             <div class="flex gap-4">
-                <div class="rounded-xl flex items-center justify-center shadow-lg app-icon app-icon-glass" data-app-name="Camera"><i class="ri-camera-line text-white text-2xl"></i></div>
+                <div class="rounded-xl flex items-center justify-center shadow-lg app-icon app-icon-glass" data-app-name="ViewPhone" title="查看角色手机"><i class="ri-cellphone-line text-white text-2xl"></i></div>
                 <div class="rounded-xl flex items-center justify-center shadow-lg app-icon app-icon-glass" data-app-name="Music"><i class="ri-music-line text-white text-2xl"></i></div>
             </div>
         </div>
@@ -14889,10 +15942,173 @@
                 </div>
             </div>
 
+            <!-- 角色手机 - 角色选择页面 -->
+            <div id="character-phone-select-screen" class="app-screen-view flex-col hidden">
+                <div class="app-header">
+                    <button id="character-phone-select-back-button" class="app-header-btn"><i class="fas fa-chevron-left"></i></button>
+                    <h3 class="app-header-title">选择要查看的手机</h3>
+                    <div class="w-8"></div>
+                </div>
+                <div id="character-phone-select-list" class="flex-1 overflow-y-auto p-2 space-y-2">
+                    <p class="text-center text-gray-500 p-8">正在加载角色列表...</p>
+                </div>
+            </div>
+
+            <!-- 角色手机 - 显示页面 -->
+            <div id="character-phone-screen" class="app-screen-view flex-col hidden bg-black">
+                <div id="character-phone-display-content" class="w-full h-full flex flex-col relative overflow-hidden rounded-[2.5rem]">
+
+                    <button id="char-phone-exit-btn" class="absolute top-4 left-1/2 -translate-x-1/2 z-50 w-10 h-10 rounded-full flex items-center justify-center" title="返回角色列表">
+                        <i class="ri-arrow-up-s-line text-2xl text-white"></i>
+                    </button>
+
+                    <div id="char-phone-wallpaper" class="absolute inset-0 z-0" style="background-image: url('https://images.unsplash.com/photo-1505909182942-e2f09aee3e89?q=80&w=2147&auto=format&fit=crop'); background-size: cover; background-position: center; filter: grayscale(100%);"></div>
+
+                    <div class="flex-grow p-4 pt-20 z-10 flex flex-col justify-start space-y-3">
+                        <div class="grid grid-cols-4 grid-rows-2 gap-x-4 gap-y-5">
+                            <div class="widget-container col-span-2 row-span-2 aspect-square flex flex-col justify-center items-center text-center p-4">
+                                <div class="widget-avatar mx-auto mb-2 w-16 h-16">
+                                    <i class="ri-user-fill text-3xl"></i>
+                                </div>
+                                <div class="widget-info">
+                                    <p class="widget-name text-lg" id="char-phone-name">角色名字</p>
+                                    <p class="widget-location mt-1 justify-center">
+                                        <i class="ri-map-pin-2-fill text-xs"></i>
+                                        <span id="char-phone-location">虚拟定位...</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="app-icon" data-char-app="痕迹">
+                                <div class="app-icon-img">
+                                    <i class="ri-footprint-line text-white"></i>
+                                </div>
+                                <p class="app-label">痕迹</p>
+                            </div>
+                            <div class="app-icon" data-char-app="不要点开">
+                                <div class="app-icon-img">
+                                    <i class="ri-eye-off-line text-white"></i>
+                                </div>
+                                <p class="app-label">不要点开</p>
+                            </div>
+                            <div class="app-icon" data-char-app="信件">
+                                <div class="app-icon-img">
+                                    <i class="ri-mail-unread-fill text-white"></i>
+                                </div>
+                                <p class="app-label">信件</p>
+                            </div>
+                            <div class="app-icon" data-char-app="设置">
+                                <div class="app-icon-img">
+                                    <i class="ri-settings-3-fill text-white"></i>
+                                </div>
+                                <p class="app-label">设置</p>
+                            </div>
+                        </div>
+
+                        <div class="widget-container col-span-4 flex flex-col items-stretch space-y-1 p-3" id="char-phone-chat-widget">
+                            <div class="widget-chat-bubble self-end">加载中...</div>
+                            <div class="widget-chat-bubble self-start">加载中...</div>
+                        </div>
+
+                        <div class="grid grid-cols-4 gap-x-4 gap-y-5">
+                            <div class="col-span-2 row-span-2 grid grid-cols-2 grid-rows-2 gap-x-4 gap-y-5">
+                                <div class="app-icon" data-char-app="梦日志">
+                                    <div class="app-icon-img">
+                                        <i class="ri-moon-clear-line text-white"></i>
+                                    </div>
+                                    <p class="app-label">梦日志</p>
+                                </div>
+                                <div class="app-icon" data-char-app="商城">
+                                    <div class="app-icon-img">
+                                        <i class="ri-shopping-bag-3-line text-white"></i>
+                                    </div>
+                                    <p class="app-label">商城</p>
+                                </div>
+                                <div class="app-icon" data-char-app="音乐">
+                                    <div class="app-icon-img">
+                                        <i class="ri-music-2-fill text-white"></i>
+                                    </div>
+                                    <p class="app-label">音乐</p>
+                                </div>
+                                <div class="app-icon" data-char-app="浏览器">
+                                    <div class="app-icon-img">
+                                        <i class="ri-safari-fill text-white"></i>
+                                    </div>
+                                    <p class="app-label">浏览器</p>
+                                </div>
+                            </div>
+
+                            <div class="widget-container col-span-2 row-span-2 aspect-square flex-col justify-start text-left p-3 memo-widget">
+                                <div class="flex-grow flex flex-col justify-center space-y-1" id="char-phone-memo-list">
+                                    <div class="memo-line">
+                                        <span class="memo-icon">☆</span>
+                                        <span class="memo-text">加载中...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dock z-30 mb-2">
+                        <div class="grid grid-cols-3 justify-items-center">
+                            <div class="app-icon" data-char-app="微信">
+                                <div class="app-icon-img">
+                                    <i class="fab fa-weixin text-white"></i>
+                                </div>
+                            </div>
+                            <div class="app-icon" data-char-app="通讯录">
+                                <div class="app-icon-img">
+                                    <i class="ri-contacts-book-2-fill text-white"></i>
+                                </div>
+                            </div>
+                            <div class="app-icon" data-char-app="通话记录">
+                                <div class="app-icon-img">
+                                    <i class="ri-phone-fill text-white"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="char-phone-message-box" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black/70 text-white px-6 py-2 rounded-full text-sm opacity-0 transform scale-90 z-[100]">
+                        打开 App...
+                    </div>
+
+                </div>
+
+            <div id="char-phone-app-detail-view" class="app-detail-view z-40">
+                <div class="app-header">
+                    <button id="char-phone-app-back-btn" class="app-nav-btn"><i class="ri-arrow-left-s-line"></i></button>
+                    <h2 id="char-phone-app-title" class="app-title">App 名称</h2>
+                    <button id="char-phone-app-refresh-btn" class="app-nav-btn"><i class="ri-refresh-line"></i></button>
+                </div>
+                <div id="char-phone-app-content-list" class="app-content-list">
+                    </div>
+            </div>
+
+            <div id="char-phone-chat-detail-view" class="app-detail-view z-50">
+                <div class="app-header">
+                    <button id="char-phone-chat-back-btn" class="app-nav-btn"><i class="ri-arrow-left-s-line"></i></button>
+                    <h2 id="char-phone-chat-title" class="app-title">联系人名称</h2>
+                    <div class="w-10"></div> </div>
+                <div id="char-phone-chat-content-area" class="app-content-list p-3 space-y-3">
+                    </div>
+            </div>
+
+            <div id="char-phone-single-message-view" class="app-detail-view z-40">
+                 <div class="app-header">
+                    <button id="char-phone-single-msg-back-btn" class="app-nav-btn"><i class="ri-arrow-left-s-line"></i></button>
+                    <h2 id="char-phone-single-msg-title" class="app-title">不要点开</h2>
+                    <button id="char-phone-single-msg-refresh-btn" class="app-nav-btn"><i class="ri-refresh-line"></i></button>
+                </div>
+                <div id="char-phone-single-msg-content" class="p-6 text-white text-lg leading-relaxed">
+                    </div>
+            </div>
+
+            </div>
+
         </div>
         
         <!-- Dock栏 - 从home-screen中移出，现在与phone-screen成为兄弟关系 -->
-        <div class="dock absolute bottom-4 left-1/2 -translate-x-1/2 w-[90%] max-w-[340px] h-18 rounded-3xl p-2 flex items-center justify-around shadow-xl">
+        <div id="main-dock" class="dock absolute bottom-4 left-1/2 -translate-x-1/2 w-[90%] max-w-[340px] h-18 rounded-3xl p-2 flex items-center justify-around shadow-xl">
             <div class="flex flex-col items-center"><div class="bg-zinc-800 rounded-xl flex items-center justify-center shadow-lg app-icon" data-app-name="世界书"><i class="fas fa-book text-white text-2xl"></i></div></div>
             <div class="flex flex-col items-center"><div class="bg-zinc-800 rounded-xl flex items-center justify-center shadow-lg app-icon" data-app-name="角色书"><i class="fas fa-theater-masks text-white text-2xl"></i></div></div>
             <div class="flex flex-col items-center"><div class="bg-zinc-800 rounded-xl flex items-center justify-center shadow-lg app-icon" data-app-name="微信"><i class="fab fa-weixin text-white text-2xl"></i></div></div>
@@ -16595,6 +17811,7 @@
         let chatCapsules = {}; // 新增：用于存储封存的聊天记录
         let mailData = {}; // 【【新增】】用于存储所有角色的信件
         let currentMailCharacterId = null; // 【【新增】】用于记录当前正在查看哪个角色的信箱
+        let currentViewingPhoneCharId = null; // 【新增】用于记录当前正在查看哪个角色的手机
         let currentLetterId = null; // 【【新增】】用于记录当前正在查看的信件ID
         let userStickers = []; 
         let userAvatars = {};
@@ -16887,10 +18104,10 @@ function getChatBackgroundElement() {
                 statusBar.classList.remove('transparent-override');
             }
 
-            // 新增：控制Dock栏的显示和隐藏
-            const dockEl = document.querySelector('.dock');
-            if (dockEl) {
-                dockEl.style.display = screenId === 'home-screen' ? 'flex' : 'none';
+            // 新增：控制主Dock栏的显示和隐藏（只控制外部的主dock，不影响角色手机内的dock）
+            const mainDockEl = document.getElementById('main-dock');
+            if (mainDockEl) {
+                mainDockEl.style.display = screenId === 'home-screen' ? 'flex' : 'none';
             }
         }
 
@@ -16928,6 +18145,1080 @@ function getChatBackgroundElement() {
                 console.error(`加载数据时发生意外错误 (key: ${key}):`, e);
                 return defaultValue;
             }
+        }
+
+        // ================== 【角色手机 App 数据管理】 ==================
+        
+        // 全局变量：存储所有角色的手机 App 数据
+        let characterPhoneData = loadData('characterPhoneData', {});
+
+        // 加载指定角色的指定 App 数据
+        function loadCharacterAppData(characterId, appName) {
+            return characterPhoneData[characterId]?.[appName] || []; // 返回数组或空数组
+        }
+
+        // 保存指定角色的指定 App 数据
+        function saveCharacterAppData(characterId, appName, data) {
+            if (!characterPhoneData[characterId]) {
+                characterPhoneData[characterId] = {};
+            }
+            // 确保保存的是数组
+            characterPhoneData[characterId][appName] = Array.isArray(data) ? data : [];
+            saveData('characterPhoneData', characterPhoneData);
+        }
+
+        // 更新或添加单个项目
+        function upsertCharacterAppDataItem(characterId, appName, item) {
+            let appData = loadCharacterAppData(characterId, appName);
+            const existingIndex = appData.findIndex(i => i.id === item.id);
+            if (existingIndex > -1) {
+                appData[existingIndex] = item; // 更新
+            } else {
+                if (!item.id) item.id = `${appName}_${Date.now()}`; // 确保有ID
+                appData.unshift(item); // 添加到最前面
+            }
+            // 限制列表长度，例如最多保存20条记录
+            if (appData.length > 20) {
+                appData = appData.slice(0, 20);
+            }
+            saveCharacterAppData(characterId, appName, appData);
+            return appData; // 返回更新后的完整列表
+        }
+
+        // 删除单个项目
+        function deleteCharacterAppDataItem(characterId, appName, itemId) {
+            let appData = loadCharacterAppData(characterId, appName);
+            appData = appData.filter(i => i.id !== itemId);
+            saveCharacterAppData(characterId, appName, appData);
+            return appData; // 返回更新后的完整列表
+        }
+
+        // ================== 【角色手机 App 视图管理】 ==================
+
+        // App 名称映射（英文 -> 中文）
+        const appNameMapping = {
+            'Traces': '痕迹', 'Letters': '信件', 'DreamDiary': '梦日志',
+            'Mall': '商城', 'Music': '音乐', 'Browser': '浏览器',
+            'Contacts': '通讯录', 'CallLog': '通话记录'
+        };
+
+        // 格式化AI生成的长文本，自动添加段落分隔
+        function formatAITextContent(text) {
+            if (!text) return '';
+            
+            // 移除首尾空白
+            text = text.trim();
+            
+            // 按换行符分割，但保留有内容的段落
+            const lines = text.split('\n');
+            const paragraphs = [];
+            let currentParagraph = '';
+            
+            for (let line of lines) {
+                line = line.trim();
+                
+                // 如果是空行，当前段落结束
+                if (line === '') {
+                    if (currentParagraph) {
+                        paragraphs.push(currentParagraph);
+                        currentParagraph = '';
+                    }
+                } else {
+                    // 累积到当前段落
+                    if (currentParagraph) {
+                        currentParagraph += ' ' + line;
+                    } else {
+                        currentParagraph = line;
+                    }
+                }
+            }
+            
+            // 添加最后一个段落
+            if (currentParagraph) {
+                paragraphs.push(currentParagraph);
+            }
+            
+            // 如果没有段落分隔，尝试按句号、问号、感叹号后的较长停顿来智能分段
+            if (paragraphs.length === 1 && paragraphs[0].length > 150) {
+                const text = paragraphs[0];
+                paragraphs.length = 0;
+                
+                // 按中文句末标点+可能的空格来分割
+                const sentences = text.split(/([。！？\.!?]+[\s]*)/);
+                currentParagraph = '';
+                
+                for (let i = 0; i < sentences.length; i++) {
+                    const part = sentences[i];
+                    currentParagraph += part;
+                    
+                    // 每3-4句话一段，或者超过100字一段
+                    if (currentParagraph.length > 100 && /[。！？\.!?]/.test(part)) {
+                        paragraphs.push(currentParagraph.trim());
+                        currentParagraph = '';
+                    }
+                }
+                
+                if (currentParagraph.trim()) {
+                    paragraphs.push(currentParagraph.trim());
+                }
+            }
+            
+            // 转换为HTML，每个段落用<p>标签包裹，段落间有间距
+            return paragraphs.map(p => `<p style="margin-bottom: 1rem; line-height: 1.6;">${p}</p>`).join('');
+        }
+
+        // 通用的 App 视图打开函数
+        function openCharacterAppView(appName, characterId, initialRenderFunction) {
+            const detailView = document.getElementById('char-phone-app-detail-view');
+            const titleEl = document.getElementById('char-phone-app-title');
+            const refreshBtn = document.getElementById('char-phone-app-refresh-btn');
+            const listContainer = document.getElementById('char-phone-app-content-list');
+
+            if (!detailView || !titleEl || !refreshBtn || !listContainer) {
+                console.error("角色手机App详情视图的必要元素未找到!");
+                return;
+            }
+
+            // 设置标题
+            titleEl.textContent = appNameMapping[appName] || appName;
+
+            // 为刷新按钮绑定当前 App 的刷新逻辑
+            refreshBtn.onclick = () => refreshCharacterAppData(appName, characterId);
+            refreshBtn.style.display = 'inline-flex'; // 确保刷新按钮可见
+
+            // 清空列表并调用初始渲染函数
+            listContainer.innerHTML = '';
+            initialRenderFunction(characterId); // 渲染本地保存的数据或提示
+
+            // 显示 App 详情页
+            detailView.style.display = 'flex';
+        }
+
+        // App 返回按钮逻辑
+        function setupCharPhoneAppBackButton() {
+            const charPhoneAppBackBtn = document.getElementById('char-phone-app-back-btn');
+            if (charPhoneAppBackBtn) {
+                charPhoneAppBackBtn.addEventListener('click', () => {
+                    const detailView = document.getElementById('char-phone-app-detail-view');
+                    if (detailView) {
+                        detailView.style.display = 'none'; // 隐藏详情页，返回角色手机主界面
+                    }
+                });
+            } else {
+                console.warn("未找到角色手机 App 返回按钮 #char-phone-app-back-btn");
+            }
+        }
+
+        // ================== 【角色手机 App API 调用】 ==================
+
+        // 核心函数：调用 AI 生成角色手机 App 数据
+        async function generateCharacterAppData(appName, characterId) {
+            showCharPhoneMessageBox('正在刷新...'); // 显示加载提示
+            const refreshBtn = document.getElementById('char-phone-app-refresh-btn');
+            const icon = refreshBtn ? refreshBtn.querySelector('i') : null;
+            if (icon) icon.classList.add('animate-spin'); // 开始旋转动画
+
+            const character = characters.find(c => c.id === characterId);
+            if (!character) {
+                if (icon) icon.classList.remove('animate-spin');
+                showCharPhoneMessageBox('角色未找到');
+                return null;
+            }
+
+            const context = gatherAIContext(characterId); // 获取完整上下文
+            if (!context) {
+                if (icon) icon.classList.remove('animate-spin');
+                showMessageBox('无法获取角色数据');
+                return null;
+            }
+
+            const userName = loadData('perch_username') || '用户';
+
+            // 构建通用 System Prompt
+            let systemPrompt = `
+身份：你现在就是角色【${character.name}】(${character.persona})。
+任务：模拟你手机里的【${appNameMapping[appName] || appName}】App 中的内容。内容必须极度符合你的角色设定、与【我 (${userName})】的关系(${character.myPersona || '未知'})、以及你近期的活动和心境（参考[上下文信息]）。内容要真实、私密，可以大胆露骨。
+输出格式：你的输出必须是且只能是一个 JSON 数组，数组中包含 ${appName === 'Contacts' ? '5-7' : '3-5'} 个对象。每个对象的具体结构根据 App 类型决定（见下文）。不要包含任何其他文字或解释。
+上下文信息 (你的记忆和近期活动)：
+[当前时间]: ${new Date().toLocaleString()}
+[世界书设定]: ${context.worldBookContext || '无'}
+[最近聊天记录]: ${context.chatHistory.map(m => `${m.sender === 'user' ? userName : '你'}: ${m.content}`).join('\n')}
+[你的记忆胶囊]: ${context.memoryContext || '无'}
+
+不同 App 的 JSON 对象结构要求：
+`;
+
+            // 根据不同 App 添加特定的结构要求
+            switch (appName) {
+                case 'Traces':
+                    systemPrompt += `
+[{"id": "trace_1", "location": "地点名称", "time": "大概时间", "reason": "为什么去/联想 (可选)"}]`;
+                    break;
+                case 'Letters':
+                    systemPrompt += `
+[{"id": "letter_1", "recipient": "收信人(可以是'你'或别人)", "title": "信件标题", "content": "信件内容 (200-300字)", "mood": "写信时的心情"}]`;
+                    break;
+                case 'DreamDiary':
+                    systemPrompt += `
+[{"id": "dream_1", "title": "梦境标题", "content": "详细梦境描述 (体现潜意识、欲望、恐惧)", "interpretation": "你对这个梦的解读 (可选)"}]`;
+                    break;
+                case 'Mall':
+                    systemPrompt += `
+[{"id": "item_1", "name": "商品名称", "status": "已购买/购物车", "reason": "购买/想买的原因", "price": "大概价格 (可选)"}]`;
+                    break;
+                case 'Music':
+                    systemPrompt += `
+[{"id": "song_1", "title": "歌名", "artist": "歌手", "reason": "最近为什么听/联想"}]`;
+                    break;
+                case 'Browser':
+                    systemPrompt += `
+[{"id": "search_1", "query": "搜索关键词", "title": "相关文章标题", "preview": "文章预览 (100字左右)", "fullContent": "模拟的完整文章内容(300-500字)"}]`;
+                    break;
+                case 'Contacts':
+                    systemPrompt += `
+[{"id": "contact_1", "name": "联系人名字", "relation": "与你的关系(不要使用电话号码)", "relationDetail": "对这段关系的详细描述，80-150字，客观但有趣地描述你们的关系、相识经过、相处模式、对方性格特点等"}... (包含 '我' 和其他 4-6 个联系人)]`;
+                    break;
+                case 'CallLog':
+                    systemPrompt += `
+[{"id": "call_1", "contactName": "通话对象名字", "type": "呼出/呼入/未接", "time": "通话时间", "duration": "通话时长 (可选)", "summary": "简短通话摘要 (可选，如'关于项目')", "callContent": "从你的视角简略记忆这次通话的内容，200-300字，包括对话重点、对方态度、你的感受等"}]`;
+                    break;
+                default:
+                    if (icon) icon.classList.remove('animate-spin');
+                    console.error("未知的 App 名称:", appName);
+                    showCharPhoneMessageBox('未知的 App');
+                    return null;
+            }
+
+            try {
+                const aiResponse = await callAI(systemPrompt, "根据你的设定和近期活动，生成以下应用的数据。");
+                if (aiResponse) {
+                    // 尝试提取 JSON 数组
+                    const jsonMatch = aiResponse.match(/\[\s*\{[\s\S]*?\}\s*\]/);
+                    if (jsonMatch) {
+                        const parsedData = JSON.parse(jsonMatch[0]);
+                        if (icon) icon.classList.remove('animate-spin');
+                        showCharPhoneMessageBox('刷新完成');
+                        return parsedData; // 返回解析后的数组
+                    } else {
+                        throw new Error("AI 返回的不是有效的 JSON 数组格式");
+                    }
+                } else {
+                    throw new Error("AI 未返回任何内容");
+                }
+            } catch (error) {
+                console.error(`为 App [${appName}] 生成数据失败:`, error);
+                if (icon) icon.classList.remove('animate-spin');
+                showCharPhoneMessageBox(`刷新失败: ${error.message}`);
+                return null;
+            }
+        }
+
+        // App 刷新函数
+        async function refreshCharacterAppData(appName, characterId) {
+            const newData = await generateCharacterAppData(appName, characterId);
+            if (newData && Array.isArray(newData)) {
+                // 使用 upsert 来更新或添加，而不是完全覆盖，保留旧记录
+                newData.forEach(item => {
+                    upsertCharacterAppDataItem(characterId, appName, item);
+                });
+                // 重新获取完整的、排序的数据
+                const updatedData = loadCharacterAppData(characterId, appName);
+                // 找到对应的渲染函数并执行
+                const renderFunctionName = `render${appName}List`;
+                if (typeof window[renderFunctionName] === 'function') {
+                    window[renderFunctionName](characterId, updatedData);
+                } else {
+                    console.warn(`未找到渲染函数: ${renderFunctionName}`);
+                    // 使用通用渲染逻辑作为备用
+                    renderGenericList(characterId, appName, updatedData);
+                }
+            }
+        }
+
+        // 通用列表渲染函数（备用）
+        function renderGenericList(characterId, appName, data) {
+            const listContainer = document.getElementById('char-phone-app-content-list');
+            listContainer.innerHTML = '';
+            if (!data || data.length === 0) {
+                listContainer.innerHTML = '<p class="text-center text-gray-500 p-4">还没有内容</p>';
+                return;
+            }
+            data.forEach(item => {
+                const itemEl = document.createElement('div');
+                itemEl.className = 'list-item';
+                // 只显示主要的几个字段作为预览
+                itemEl.innerHTML = `
+                    <div class="list-item-content">
+                        <div class="list-item-title">${item.title || item.name || item.location || item.query || '未知项目'}</div>
+                        <div class="list-item-preview">${(item.preview || item.content?.substring(0,50) || item.reason || item.time || '') + '...'}</div>
+                    </div>
+                    <div>
+                        <button class="edit-item-btn text-blue-400 mr-2" data-id="${item.id}" data-app="${appName}"><i class="ri-edit-line"></i></button>
+                        <button class="delete-item-btn text-red-400" data-id="${item.id}" data-app="${appName}"><i class="ri-delete-bin-line"></i></button>
+                    </div>
+                `;
+                listContainer.appendChild(itemEl);
+            });
+            // 为新生成的编辑/删除按钮绑定事件
+            setupListItemActions(characterId);
+        }
+
+        // ================== 【角色手机 App 特定渲染函数】 ==================
+
+        // 渲染梦日记列表
+        function renderDreamDiaryList(characterId, data = null) {
+            const listContainer = document.getElementById('char-phone-app-content-list');
+            listContainer.innerHTML = '';
+            const dreamData = data || loadCharacterAppData(characterId, 'DreamDiary');
+
+            if (dreamData.length === 0) {
+                listContainer.innerHTML = '<p class="text-center text-gray-500 p-4">最近没有记录梦境</p>';
+                return;
+            }
+
+            dreamData.forEach(dream => {
+                const itemEl = document.createElement('div');
+                itemEl.className = 'list-item';
+                itemEl.innerHTML = `
+                    <div class="list-item-content">
+                        <div class="list-item-title">${dream.title || '无标题的梦'}</div>
+                        <div class="list-item-preview">${dream.content ? dream.content.substring(0, 50) + '...' : '梦境内容为空'}</div>
+                    </div>
+                    <div>
+                        <button class="edit-item-btn text-blue-400 mr-2" data-id="${dream.id}" data-app="DreamDiary"><i class="ri-edit-line"></i></button>
+                        <button class="delete-item-btn text-red-400" data-id="${dream.id}" data-app="DreamDiary"><i class="ri-delete-bin-line"></i></button>
+                    </div>
+                `;
+                // 点击列表项查看完整内容
+                itemEl.addEventListener('click', (e) => {
+                    if (!e.target.closest('button')) {
+                        viewDreamDetail(dream);
+                    }
+                });
+                listContainer.appendChild(itemEl);
+            });
+            setupListItemActions(characterId);
+        }
+
+        // 查看梦境详情
+        function viewDreamDetail(dream) {
+            const formattedContent = formatAITextContent(dream.content || '无内容');
+            const formattedInterpretation = dream.interpretation ? formatAITextContent(dream.interpretation) : '';
+            const modalContent = `
+                <p><strong>梦境:</strong> ${dream.title || '未命名梦境'}</p>
+                <div style="margin-top: 1rem;"><strong>梦境内容:</strong></div>
+                <div style="margin-top: 0.5rem;">${formattedContent}</div>
+                ${dream.interpretation ? `<div style="margin-top: 1rem;"><strong>解读:</strong></div><div style="margin-top: 0.5rem;">${formattedInterpretation}</div>` : ''}
+            `;
+            
+            showCharacterPhoneAlert('梦境详情', modalContent);
+        }
+
+        // 渲染痕迹列表
+        function renderTracesList(characterId, data = null) {
+            const listContainer = document.getElementById('char-phone-app-content-list');
+            listContainer.innerHTML = '';
+            const tracesData = data || loadCharacterAppData(characterId, 'Traces');
+
+            if (tracesData.length === 0) {
+                listContainer.innerHTML = '<p class="text-center text-gray-500 p-4">还没有痕迹记录</p>';
+                return;
+            }
+
+            tracesData.forEach(trace => {
+                const itemEl = document.createElement('div');
+                itemEl.className = 'list-item';
+                itemEl.innerHTML = `
+                    <div class="list-item-content">
+                        <div class="list-item-title">${trace.location || '未知地点'}</div>
+                        <div class="list-item-preview">${trace.time || ''} ${trace.reason ? '- ' + trace.reason : ''}</div>
+                    </div>
+                    <div>
+                        <button class="edit-item-btn text-blue-400 mr-2" data-id="${trace.id}" data-app="Traces"><i class="ri-edit-line"></i></button>
+                        <button class="delete-item-btn text-red-400" data-id="${trace.id}" data-app="Traces"><i class="ri-delete-bin-line"></i></button>
+                    </div>
+                `;
+                itemEl.addEventListener('click', (e) => {
+                    if (!e.target.closest('button')) {
+                        const formattedReason = trace.reason ? formatAITextContent(trace.reason) : '';
+                        const traceContent = `
+                            <p><strong>地点:</strong> ${trace.location || '未知地点'}</p>
+                            ${trace.time ? `<p style="margin-top: 1rem;"><strong>时间:</strong> ${trace.time}</p>` : ''}
+                            ${trace.reason ? `<div style="margin-top: 1rem;"><strong>原因:</strong></div><div style="margin-top: 0.5rem;">${formattedReason}</div>` : ''}
+                            ${trace.mood ? `<p style="margin-top: 1rem;"><strong>心情:</strong> ${trace.mood}</p>` : ''}
+                        `;
+                        showCharacterPhoneAlert('痕迹详情', traceContent);
+                    }
+                });
+                listContainer.appendChild(itemEl);
+            });
+            setupListItemActions(characterId);
+        }
+
+        // 渲染信件列表
+        function renderLettersList(characterId, data = null) {
+            const listContainer = document.getElementById('char-phone-app-content-list');
+            listContainer.innerHTML = '';
+            const lettersData = data || loadCharacterAppData(characterId, 'Letters');
+
+            if (lettersData.length === 0) {
+                listContainer.innerHTML = '<p class="text-center text-gray-500 p-4">还没有信件</p>';
+                return;
+            }
+
+            lettersData.forEach(letter => {
+                const itemEl = document.createElement('div');
+                itemEl.className = 'list-item';
+                itemEl.innerHTML = `
+                    <div class="list-item-content">
+                        <div class="list-item-title">致 ${letter.recipient || '未知'}: ${letter.title || '无标题'}</div>
+                        <div class="list-item-preview">${letter.content ? letter.content.substring(0, 50) + '...' : ''}</div>
+                    </div>
+                    <div>
+                        <button class="edit-item-btn text-blue-400 mr-2" data-id="${letter.id}" data-app="Letters"><i class="ri-edit-line"></i></button>
+                        <button class="delete-item-btn text-red-400" data-id="${letter.id}" data-app="Letters"><i class="ri-delete-bin-line"></i></button>
+                    </div>
+                `;
+                itemEl.addEventListener('click', (e) => {
+                    if (!e.target.closest('button')) {
+                        const formattedContent = formatAITextContent(letter.content || '无内容');
+                        const letterContent = `
+                            <p><strong>致:</strong> ${letter.recipient || '未知收件人'}</p>
+                            <p style="margin-top: 1rem;"><strong>标题:</strong> ${letter.title || '无标题'}</p>
+                            <div style="margin-top: 1rem;">${formattedContent}</div>
+                            ${letter.mood ? `<p style="margin-top: 1rem;"><strong>心情:</strong> ${letter.mood}</p>` : ''}
+                        `;
+                        showCharacterPhoneAlert('信件详情', letterContent);
+                    }
+                });
+                listContainer.appendChild(itemEl);
+            });
+            setupListItemActions(characterId);
+        }
+
+        // 渲染商城列表
+        function renderMallList(characterId, data = null) {
+            const listContainer = document.getElementById('char-phone-app-content-list');
+            listContainer.innerHTML = '';
+            const mallData = data || loadCharacterAppData(characterId, 'Mall');
+
+            if (mallData.length === 0) {
+                listContainer.innerHTML = '<p class="text-center text-gray-500 p-4">购物车为空</p>';
+                return;
+            }
+
+            mallData.forEach(item => {
+                const itemEl = document.createElement('div');
+                itemEl.className = 'list-item';
+                itemEl.innerHTML = `
+                    <div class="list-item-content">
+                        <div class="list-item-title">${item.name || '未知商品'} ${item.price ? '- ' + item.price : ''}</div>
+                        <div class="list-item-preview">${item.status || ''} ${item.reason ? '- ' + item.reason : ''}</div>
+                    </div>
+                    <div>
+                        <button class="edit-item-btn text-blue-400 mr-2" data-id="${item.id}" data-app="Mall"><i class="ri-edit-line"></i></button>
+                        <button class="delete-item-btn text-red-400" data-id="${item.id}" data-app="Mall"><i class="ri-delete-bin-line"></i></button>
+                    </div>
+                `;
+                itemEl.addEventListener('click', (e) => {
+                    if (!e.target.closest('button')) {
+                        const formattedReason = item.reason ? formatAITextContent(item.reason) : '';
+                        const mallContent = `
+                            <p><strong>商品:</strong> ${item.name || '未知商品'}</p>
+                            ${item.price ? `<p style="margin-top: 1rem;"><strong>价格:</strong> ${item.price}</p>` : ''}
+                            ${item.status ? `<p style="margin-top: 1rem;"><strong>状态:</strong> ${item.status}</p>` : ''}
+                            ${item.reason ? `<div style="margin-top: 1rem;"><strong>购买原因:</strong></div><div style="margin-top: 0.5rem;">${formattedReason}</div>` : ''}
+                        `;
+                        showCharacterPhoneAlert('商品详情', mallContent);
+                    }
+                });
+                listContainer.appendChild(itemEl);
+            });
+            setupListItemActions(characterId);
+        }
+
+        // 渲染音乐列表
+        function renderMusicList(characterId, data = null) {
+            const listContainer = document.getElementById('char-phone-app-content-list');
+            listContainer.innerHTML = '';
+            const musicData = data || loadCharacterAppData(characterId, 'Music');
+
+            if (musicData.length === 0) {
+                listContainer.innerHTML = '<p class="text-center text-gray-500 p-4">还没有播放记录</p>';
+                return;
+            }
+
+            musicData.forEach(song => {
+                const itemEl = document.createElement('div');
+                itemEl.className = 'list-item';
+                itemEl.innerHTML = `
+                    <div class="list-item-content">
+                        <div class="list-item-title">${song.title || '未知歌曲'} - ${song.artist || '未知歌手'}</div>
+                        <div class="list-item-preview">${song.reason || ''}</div>
+                    </div>
+                    <div>
+                        <button class="edit-item-btn text-blue-400 mr-2" data-id="${song.id}" data-app="Music"><i class="ri-edit-line"></i></button>
+                        <button class="delete-item-btn text-red-400" data-id="${song.id}" data-app="Music"><i class="ri-delete-bin-line"></i></button>
+                    </div>
+                `;
+                itemEl.addEventListener('click', (e) => {
+                    if (!e.target.closest('button')) {
+                        const formattedReason = song.reason ? formatAITextContent(song.reason) : '';
+                        const musicContent = `
+                            <p><strong>歌曲:</strong> ${song.title || '未知歌曲'}</p>
+                            ${song.artist ? `<p style="margin-top: 1rem;"><strong>歌手:</strong> ${song.artist}</p>` : ''}
+                            ${song.album ? `<p style="margin-top: 1rem;"><strong>专辑:</strong> ${song.album}</p>` : ''}
+                            ${song.reason ? `<div style="margin-top: 1rem;"><strong>原因:</strong></div><div style="margin-top: 0.5rem;">${formattedReason}</div>` : ''}
+                        `;
+                        showCharacterPhoneAlert('音乐详情', musicContent);
+                    }
+                });
+                listContainer.appendChild(itemEl);
+            });
+            setupListItemActions(characterId);
+        }
+
+        // 渲染浏览器历史列表
+        function renderBrowserHistoryList(characterId, data = null) {
+            const listContainer = document.getElementById('char-phone-app-content-list');
+            listContainer.innerHTML = '';
+            const browserData = data || loadCharacterAppData(characterId, 'Browser');
+
+            if (browserData.length === 0) {
+                listContainer.innerHTML = '<p class="text-center text-gray-500 p-4">浏览历史为空</p>';
+                return;
+            }
+
+            browserData.forEach(item => {
+                const itemEl = document.createElement('div');
+                itemEl.className = 'list-item';
+                itemEl.innerHTML = `
+                    <div class="list-item-content">
+                        <div class="list-item-title">${item.title || item.query || '未知网页'}</div>
+                        <div class="list-item-preview">${item.preview ? item.preview.substring(0, 50) + '...' : ''}</div>
+                    </div>
+                    <div>
+                        <button class="edit-item-btn text-blue-400 mr-2" data-id="${item.id}" data-app="Browser"><i class="ri-edit-line"></i></button>
+                        <button class="delete-item-btn text-red-400" data-id="${item.id}" data-app="Browser"><i class="ri-delete-bin-line"></i></button>
+                    </div>
+                `;
+                itemEl.addEventListener('click', (e) => {
+                    if (!e.target.closest('button')) {
+                        const formattedContent = formatAITextContent(item.fullContent || item.preview || '无内容');
+                        const browserContent = `
+                            <p><strong>${item.title || '未知网页'}</strong></p>
+                            <div style="margin-top: 1rem;">${formattedContent}</div>
+                        `;
+                        showCharacterPhoneAlert('浏览历史详情', browserContent);
+                    }
+                });
+                listContainer.appendChild(itemEl);
+            });
+            setupListItemActions(characterId);
+        }
+
+        // 渲染通讯录列表
+        function renderContactsList(characterId, data = null) {
+            const listContainer = document.getElementById('char-phone-app-content-list');
+            listContainer.innerHTML = '';
+            const contactsData = data || loadCharacterAppData(characterId, 'Contacts');
+
+            if (contactsData.length === 0) {
+                listContainer.innerHTML = '<p class="text-center text-gray-500 p-4">通讯录为空</p>';
+                return;
+            }
+
+            contactsData.forEach(contact => {
+                const itemEl = document.createElement('div');
+                itemEl.className = 'list-item';
+                itemEl.innerHTML = `
+                    <div class="list-item-content">
+                        <div class="list-item-title">${contact.name || '未知联系人'}</div>
+                        <div class="list-item-preview">${contact.relation || ''}</div>
+                    </div>
+                    <div>
+                        <button class="edit-item-btn text-blue-400 mr-2" data-id="${contact.id}" data-app="Contacts"><i class="ri-edit-line"></i></button>
+                        <button class="delete-item-btn text-red-400" data-id="${contact.id}" data-app="Contacts"><i class="ri-delete-bin-line"></i></button>
+                    </div>
+                `;
+                itemEl.addEventListener('click', (e) => {
+                    if (!e.target.closest('button')) {
+                        const formattedRelationDetail = contact.relationDetail ? formatAITextContent(contact.relationDetail) : '';
+                        const contactContent = `
+                            <p><strong>姓名:</strong> ${contact.name || '未知联系人'}</p>
+                            ${contact.relation ? `<p style="margin-top: 1rem;"><strong>关系:</strong> ${contact.relation}</p>` : ''}
+                            ${contact.relationDetail ? `<div style="margin-top: 1.5rem;"><strong>关系详情:</strong></div><div style="margin-top: 0.5rem; padding: 1rem; background-color: rgba(255,255,255,0.05); border-radius: 0.5rem; line-height: 1.6;">${formattedRelationDetail}</div>` : ''}
+                            ${contact.notes ? `<p style="margin-top: 1rem;"><strong>备注:</strong> ${contact.notes}</p>` : ''}
+                        `;
+                        showCharacterPhoneAlert('联系人详情', contactContent);
+                    }
+                });
+                listContainer.appendChild(itemEl);
+            });
+            setupListItemActions(characterId);
+        }
+
+        // 渲染通话记录列表
+        function renderCallLogList(characterId, data = null) {
+            const listContainer = document.getElementById('char-phone-app-content-list');
+            listContainer.innerHTML = '';
+            const callLogData = data || loadCharacterAppData(characterId, 'CallLog');
+
+            if (callLogData.length === 0) {
+                listContainer.innerHTML = '<p class="text-center text-gray-500 p-4">没有通话记录</p>';
+                return;
+            }
+
+            callLogData.forEach(call => {
+                const itemEl = document.createElement('div');
+                itemEl.className = 'list-item';
+                itemEl.innerHTML = `
+                    <div class="list-item-content">
+                        <div class="list-item-title">${call.contactName || '未知联系人'} (${call.type || ''})</div>
+                        <div class="list-item-preview">${call.time || ''} ${call.duration ? '- ' + call.duration : ''}</div>
+                    </div>
+                    <div>
+                        <button class="edit-item-btn text-blue-400 mr-2" data-id="${call.id}" data-app="CallLog"><i class="ri-edit-line"></i></button>
+                        <button class="delete-item-btn text-red-400" data-id="${call.id}" data-app="CallLog"><i class="ri-delete-bin-line"></i></button>
+                    </div>
+                `;
+                itemEl.addEventListener('click', (e) => {
+                    if (!e.target.closest('button')) {
+                        const formattedCallContent = call.callContent ? formatAITextContent(call.callContent) : '';
+                        const callContent = `
+                            <p><strong>联系人:</strong> ${call.contactName || '未知联系人'}</p>
+                            ${call.type ? `<p style="margin-top: 1rem;"><strong>通话类型:</strong> ${call.type}</p>` : ''}
+                            ${call.time ? `<p style="margin-top: 1rem;"><strong>时间:</strong> ${call.time}</p>` : ''}
+                            ${call.duration ? `<p style="margin-top: 1rem;"><strong>时长:</strong> ${call.duration}</p>` : ''}
+                            ${call.callContent ? `<div style="margin-top: 1.5rem;"><strong>通话内容:</strong></div><div style="margin-top: 0.5rem; padding: 1rem; background-color: rgba(255,255,255,0.05); border-radius: 0.5rem; line-height: 1.6;">${formattedCallContent}</div>` : ''}
+                            ${call.notes ? `<p style="margin-top: 1rem;"><strong>备注:</strong> ${call.notes}</p>` : ''}
+                        `;
+                        showCharacterPhoneAlert('通话记录详情', callContent);
+                    }
+                });
+                listContainer.appendChild(itemEl);
+            });
+            setupListItemActions(characterId);
+        }
+
+        // ================== 【角色手机 App 项目编辑/删除】 ==================
+
+        // 为列表项的编辑/删除按钮绑定事件
+        function setupListItemActions(characterId) {
+            const listContainer = document.getElementById('char-phone-app-content-list');
+            
+            // 移除旧监听器（使用 cloneNode）
+            listContainer.querySelectorAll('.edit-item-btn').forEach(btn => {
+                const newBtn = btn.cloneNode(true);
+                btn.parentNode.replaceChild(newBtn, btn);
+            });
+            listContainer.querySelectorAll('.delete-item-btn').forEach(btn => {
+                const newBtn = btn.cloneNode(true);
+                btn.parentNode.replaceChild(newBtn, btn);
+            });
+
+            // 重新获取按钮并添加新监听器
+            listContainer.querySelectorAll('.edit-item-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const itemId = e.currentTarget.dataset.id;
+                    const appName = e.currentTarget.dataset.app;
+                    handleEditItem(characterId, appName, itemId);
+                });
+            });
+            listContainer.querySelectorAll('.delete-item-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const itemId = e.currentTarget.dataset.id;
+                    const appName = e.currentTarget.dataset.app;
+                    handleDeleteItem(characterId, appName, itemId);
+                });
+            });
+        }
+
+        // 编辑项目处理函数
+        function handleEditItem(characterId, appName, itemId) {
+            const appData = loadCharacterAppData(characterId, appName);
+            const item = appData.find(i => i.id === itemId);
+            if (!item) return;
+
+            // 找到主要字段
+            const mainFieldKey = item.title ? 'title' : item.name ? 'name' : item.location ? 'location' : item.query ? 'query' : Object.keys(item).find(k => k !== 'id');
+            const mainField = item[mainFieldKey] || '';
+            
+            const newValue = prompt(`编辑 "${mainFieldKey}":`, mainField);
+            if (newValue !== null && newValue.trim() !== mainField) {
+                item[mainFieldKey] = newValue.trim();
+                
+                // 如果有 content 字段，也允许编辑
+                if (item.content) {
+                    const newContent = prompt(`编辑内容:`, item.content);
+                    if (newContent !== null) item.content = newContent.trim();
+                }
+                
+                upsertCharacterAppDataItem(characterId, appName, item);
+                
+                // 重新渲染列表
+                const renderFunctionName = `render${appName}List`;
+                if (typeof window[renderFunctionName] === 'function') {
+                    window[renderFunctionName](characterId);
+                } else {
+                    renderGenericList(characterId, appName, loadCharacterAppData(characterId, appName));
+                }
+                showMessageBox('已保存更改');
+            }
+        }
+
+        // 删除项目处理函数
+        function handleDeleteItem(characterId, appName, itemId) {
+            const appData = loadCharacterAppData(characterId, appName);
+            const item = appData.find(i => i.id === itemId);
+            if (!item) return;
+
+            const mainField = item.title || item.name || item.location || item.query || '该项目';
+
+            if (confirm(`确定要删除 "${mainField}" 吗？`)) {
+                const updatedData = deleteCharacterAppDataItem(characterId, appName, itemId);
+                
+                // 重新渲染列表
+                const renderFunctionName = `render${appName}List`;
+                if (typeof window[renderFunctionName] === 'function') {
+                    window[renderFunctionName](characterId, updatedData);
+                } else {
+                    renderGenericList(characterId, appName, updatedData);
+                }
+                showMessageBox('已删除');
+            }
+        }
+
+        // ================== 【角色手机特殊 App 处理】 ==================
+
+        // 特殊处理：不要点开 App - 初始打开（不自动加载）
+        function openCharacterApp_DontOpen(characterId) {
+            const detailView = document.getElementById('char-phone-app-detail-view');
+            const titleEl = document.getElementById('char-phone-app-title');
+            const refreshBtn = document.getElementById('char-phone-app-refresh-btn');
+            const listContainer = document.getElementById('char-phone-app-content-list');
+
+            titleEl.textContent = "不要点开";
+            refreshBtn.onclick = () => refreshDontOpenApp(characterId); // 点击刷新按钮才加载
+            refreshBtn.style.display = 'inline-flex';
+            
+            // 根据主题选择文字颜色
+            const phoneScreen = document.getElementById('character-phone-screen');
+            const isLightTheme = phoneScreen?.classList.contains('light-theme');
+            const textColor = isLightTheme ? 'text-gray-900' : 'text-white';
+            
+            listContainer.innerHTML = `<p class="text-center ${textColor} p-4">点击右上角刷新按钮查看内容</p>`;
+            detailView.style.display = 'flex';
+        }
+
+        // 刷新「不要点开」App的内容
+        async function refreshDontOpenApp(characterId) {
+            const refreshBtn = document.getElementById('char-phone-app-refresh-btn');
+            const listContainer = document.getElementById('char-phone-app-content-list');
+            const refreshIcon = refreshBtn.querySelector('i');
+
+            // 开始旋转动画
+            if (refreshIcon) refreshIcon.classList.add('spinning');
+            
+            listContainer.innerHTML = '<p class="text-center text-gray-500 p-4">正在加载...</p>';
+
+            try {
+                // 调用 API 生成内容
+                const character = characters.find(c => c.id === characterId);
+                const context = gatherAIContext(characterId);
+                const systemPrompt = `
+身份：你现在就是角色【${character.name}】(${character.persona})。
+任务：模拟你手机里一个名为【不要点开】的私密App。这里可能是你发现我在看你手机后想对我说的话，也可能是你近期的一个不为人知的秘密或想法。内容要符合你的性格和近期心境。
+输出格式：直接输出你想写下的那段文字 (100-200字)，不要包含任何 JSON 或其他标记。`;
+
+                const aiResponse = await callAI(systemPrompt, "生成【不要点开】App的内容。");
+                if (aiResponse) {
+                    // 根据主题选择文字颜色：日间模式用黑色，夜间模式用白色
+                    const phoneScreen = document.getElementById('character-phone-screen');
+                    const isLightTheme = phoneScreen?.classList.contains('light-theme');
+                    const textColor = isLightTheme ? 'text-gray-900' : 'text-white';
+                    const formattedContent = formatAITextContent(aiResponse);
+                    listContainer.innerHTML = `<div class="p-4 ${textColor}">${formattedContent}</div>`;
+                } else {
+                    listContainer.innerHTML = '<p class="text-center text-red-500 p-4">加载失败</p>';
+                }
+            } finally {
+                // 停止旋转动画
+                if (refreshIcon) refreshIcon.classList.remove('spinning');
+            }
+        }
+
+        // 特殊处理：设置 App
+        function openCharacterApp_Settings(characterId) {
+            const detailView = document.getElementById('char-phone-app-detail-view');
+            const titleEl = document.getElementById('char-phone-app-title');
+            const refreshBtn = document.getElementById('char-phone-app-refresh-btn');
+            const listContainer = document.getElementById('char-phone-app-content-list');
+
+            // 根据主题选择合适的文字颜色
+            const phoneScreen = document.getElementById('character-phone-screen');
+            const isLightTheme = phoneScreen?.classList.contains('light-theme');
+            const textColor = isLightTheme ? 'text-black' : 'text-white';
+            const iconColor = isLightTheme ? 'text-black' : 'text-white';
+
+            titleEl.textContent = "设置";
+            refreshBtn.style.display = 'none'; // 设置界面不需要刷新按钮
+            listContainer.innerHTML = `
+                <div class="list-item cursor-pointer" id="change-char-wallpaper-btn">
+                    <i class="ri-image-line mr-3 ${iconColor}"></i> <span class="${textColor}">更换壁纸</span>
+                </div>
+            `;
+            detailView.style.display = 'flex';
+
+            // 为更换壁纸按钮添加事件
+            setTimeout(() => {
+                const changeBtn = document.getElementById('change-char-wallpaper-btn');
+                if (changeBtn) {
+                    changeBtn.addEventListener('click', () => changeCharacterWallpaper(characterId));
+                }
+            }, 100);
+        }
+
+        // 更换角色手机壁纸的逻辑
+        function changeCharacterWallpaper(characterId) {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.onchange = async (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    try {
+                        const imageBlob = await compressImage(file, { maxWidth: 1080 }); // 壁纸可以大一点
+                        const imageId = `char_wallpaper_${characterId}_${Date.now()}`;
+                        await saveImageToDB(imageId, imageBlob);
+
+                        // 保存壁纸设置到 localStorage
+                        saveData(`char_wallpaper_${characterId}`, imageId);
+
+                        // 更新当前角色手机壁纸
+                        const wallpaperEl = document.getElementById('char-phone-wallpaper');
+                        if (wallpaperEl && currentViewingPhoneCharId === characterId) {
+                            const objectURL = URL.createObjectURL(imageBlob);
+                            wallpaperEl.style.backgroundImage = `url(${objectURL})`;
+                        }
+                        showMessageBox('壁纸已更换');
+                    } catch (error) {
+                        showMessageBox('壁纸更换失败');
+                        console.error("更换壁纸失败:", error);
+                    }
+                }
+            };
+            input.click();
+        }
+
+        // ================== 【角色手机微信 App】 ==================
+
+        // 全局变量，存储当前生成的微信数据
+        let currentWeChatData = { contacts: [], chats: {} };
+
+        // 特殊处理：iMessage App（原微信）
+        function openCharacterApp_WeChat(characterId) {
+            console.log("Opening iMessage for:", characterId);
+            const detailView = document.getElementById('char-phone-app-detail-view');
+            const titleEl = document.getElementById('char-phone-app-title');
+            const refreshBtn = document.getElementById('char-phone-app-refresh-btn');
+            const listContainer = document.getElementById('char-phone-app-content-list');
+            const chatDetailView = document.getElementById('char-phone-chat-detail-view');
+
+            // 隐藏聊天详情页（如果上次打开了）
+            if (chatDetailView) chatDetailView.style.display = 'none';
+
+            titleEl.textContent = "iMessage";
+            // 微信主界面的刷新是刷新整个联系人列表和初始消息
+            refreshBtn.onclick = () => refreshWeChatData(characterId);
+            refreshBtn.style.display = 'inline-flex';
+            
+            // 根据主题选择文字颜色
+            const phoneScreen = document.getElementById('character-phone-screen');
+            const isLightTheme = phoneScreen?.classList.contains('light-theme');
+            const textColor = isLightTheme ? 'text-gray-900' : 'text-white';
+            
+            listContainer.innerHTML = `<p class="text-center ${textColor} p-4">点击右上角刷新按钮查看联系人</p>`;
+            detailView.style.display = 'flex';
+
+            // 绑定聊天详情页的返回按钮
+            const chatDetailBackBtn = document.getElementById('char-phone-chat-back-btn');
+            if (chatDetailBackBtn) {
+                const newBackBtn = chatDetailBackBtn.cloneNode(true);
+                chatDetailBackBtn.parentNode.replaceChild(newBackBtn, chatDetailBackBtn);
+                newBackBtn.addEventListener('click', () => {
+                    chatDetailView.style.display = 'none';
+                    detailView.style.display = 'flex';
+                });
+            }
+        }
+
+        // 刷新微信数据
+        async function refreshWeChatData(characterId) {
+            const refreshBtn = document.getElementById('char-phone-app-refresh-btn');
+            const listContainer = document.getElementById('char-phone-app-content-list');
+            const refreshIcon = refreshBtn.querySelector('i');
+
+            // 开始旋转动画
+            if (refreshIcon) refreshIcon.classList.add('spinning');
+            
+            listContainer.innerHTML = '<p class="text-center text-gray-500 p-4">正在重新生成微信数据...</p>';
+            
+            try {
+                await generateWeChatData(characterId, true); // true表示强制刷新
+                renderWeChatContacts(characterId);
+            } finally {
+                // 停止旋转动画
+                if (refreshIcon) refreshIcon.classList.remove('spinning');
+            }
+        }
+
+        // 生成微信联系人和初始聊天记录
+        async function generateWeChatData(characterId, forceRefresh = false) {
+            const savedData = loadCharacterAppData(characterId, 'WeChat');
+            if (savedData && savedData.contacts && !forceRefresh) {
+                currentWeChatData = savedData;
+                console.log("Loaded saved WeChat data for:", characterId);
+                return;
+            }
+
+            console.log("Generating new WeChat data for:", characterId);
+            const character = characters.find(c => c.id === characterId);
+            const context = gatherAIContext(characterId);
+            const userName = loadData('perch_username') || '用户';
+
+            const systemPrompt = `
+身份：你现在就是角色【${character.name}】(${character.persona})。
+任务：模拟你手机微信里的联系人列表和与部分联系人的近期聊天记录。
+要求：
+- 联系人: 生成 3-5 个你可能认识或联系的人 (必须包含【${userName}】)。联系人要符合你的社交圈和[上下文信息]。
+- 聊天记录: 为每个联系人（包括【${userName}】）生成 5-10 条符合你们关系的、非常简短且口语化的近期聊天记录（有来有回）。聊天内容要能体现你们的关系、你的性格以及近期的事件（参考[上下文信息]）。
+JSON 输出: 严格按以下 JSON 格式输出，不要包含任何其他文字。
+
+JSON 格式：
+\`\`\`json
+{
+  "contacts": [
+    {"id": "user", "name": "${userName}"},
+    {"id": "contact_1", "name": "联系人1名字"},
+    {"id": "contact_2", "name": "联系人2名字"}
+  ],
+  "chats": {
+    "user": [
+      {"sender": "user", "content": "聊天内容1"},
+      {"sender": "ai", "content": "聊天内容2"}
+    ],
+    "contact_1": [
+      {"sender": "contact_1", "content": "内容1"},
+      {"sender": "ai", "content": "内容2"}
+    ]
+  }
+}
+\`\`\`
+
+*注意: "sender" 字段，如果是你 (${character.name}) 发的，用 "ai"；如果是对方发的，用对方的 id (例如 "user", "contact_1")。*
+
+上下文信息 (你的记忆和近期活动)：
+[当前时间]: ${new Date().toLocaleString()}
+[世界书设定]: ${context.worldBookContext || '无'}
+[最近聊天记录(与${userName})]: ${context.chatHistory.map(m => `${m.sender === 'user' ? userName : '你'}: ${m.content}`).join('\n')}
+[你的记忆胶囊]: ${context.memoryContext || '无'}
+`;
+
+            try {
+                const aiResponse = await callAI(systemPrompt, "生成微信联系人和聊天记录");
+                if (aiResponse) {
+                    const jsonMatch = aiResponse.match(/```json([\s\S]*?)```/);
+                    if (jsonMatch) {
+                        currentWeChatData = JSON.parse(jsonMatch[1]);
+                        currentWeChatData.generatedAt = Date.now();
+                        saveCharacterAppData(characterId, 'WeChat', currentWeChatData);
+                        console.log("Successfully generated and saved WeChat data for:", characterId);
+                    } else {
+                        throw new Error("AI 返回的不是有效的 JSON 格式");
+                    }
+                } else {
+                    throw new Error("AI 未返回任何内容");
+                }
+            } catch (error) {
+                console.error("生成微信数据失败:", error);
+                showMessageBox(`微信数据加载失败: ${error.message}`);
+                currentWeChatData = { contacts: [], chats: {} };
+                saveCharacterAppData(characterId, 'WeChat', currentWeChatData);
+            }
+        }
+
+        // 渲染微信联系人列表
+        function renderWeChatContacts(characterId) {
+            const listContainer = document.getElementById('char-phone-app-content-list');
+            listContainer.innerHTML = '';
+
+            if (!currentWeChatData || !currentWeChatData.contacts || currentWeChatData.contacts.length === 0) {
+                listContainer.innerHTML = '<p class="text-center text-gray-500 p-4">微信联系人为空</p>';
+                return;
+            }
+
+            currentWeChatData.contacts.forEach(contact => {
+                const item = document.createElement('div');
+                item.className = 'wechat-contact-item';
+                const chatHistory = currentWeChatData.chats[contact.id] || [];
+                const lastMsg = chatHistory[chatHistory.length - 1];
+                const lastMsgPreview = lastMsg ? `${lastMsg.sender === 'ai' ? '我: ' : ''}${lastMsg.content.substring(0, 30)}...` : '...';
+
+                // 确定头像
+                let avatarHTML = '';
+                if (contact.id === 'user') {
+                    const userAvatarId = loadData('perch_avatar');
+                    avatarHTML = `<div class="wechat-avatar" id="wechat-contact-avatar-${contact.id}"></div>`;
+                    setTimeout(() => {
+                        const avatarEl = document.getElementById(`wechat-contact-avatar-${contact.id}`);
+                        if (avatarEl) loadAvatar(userAvatarId, avatarEl, '我');
+                    }, 0);
+                } else {
+                    avatarHTML = `<div class="wechat-avatar"><i class="ri-user-fill"></i></div>`;
+                }
+
+                item.innerHTML = `
+                    ${avatarHTML}
+                    <div class="wechat-contact-info">
+                        <div class="wechat-contact-name">${contact.name}</div>
+                        <div class="wechat-latest-msg">${lastMsgPreview}</div>
+                    </div>
+                `;
+                item.addEventListener('click', () => showWeChatChatDetail(characterId, contact.id));
+                listContainer.appendChild(item);
+            });
+        }
+
+        // 显示微信聊天详情页
+        function showWeChatChatDetail(characterId, contactId) {
+            const detailView = document.getElementById('char-phone-app-detail-view');
+            const chatDetailView = document.getElementById('char-phone-chat-detail-view');
+            const chatDetailTitle = document.getElementById('char-phone-chat-title');
+            const chatDetailContent = document.getElementById('char-phone-chat-content-area');
+
+            const contact = currentWeChatData.contacts.find(c => c.id === contactId);
+            if (!contact) return;
+
+            chatDetailTitle.textContent = contact.name;
+            chatDetailContent.innerHTML = '';
+
+            const chatHistory = currentWeChatData.chats[contactId] || [];
+            if (chatHistory.length === 0) {
+                chatDetailContent.innerHTML = '<p class="text-xs text-gray-500 text-center py-4">还没有聊天记录</p>';
+            } else {
+                chatHistory.forEach(msg => {
+                    const bubble = document.createElement('div');
+                    bubble.className = `chat-bubble ${msg.sender === 'ai' ? 'sender' : 'receiver'}`;
+                    bubble.textContent = msg.content;
+                    chatDetailContent.appendChild(bubble);
+                });
+                setTimeout(() => chatDetailContent.scrollTop = chatDetailContent.scrollHeight, 50);
+            }
+
+            // 切换视图
+            detailView.style.display = 'none';
+            chatDetailView.style.display = 'flex';
         }
 
         // ================== 【心跳设置功能】 ==================
@@ -17324,6 +19615,12 @@ function getChatBackgroundElement() {
             if (savedTheme === 'dark') {
                 updateChatBubbleColors();
                 updateMomentsCommentColors();
+            }
+
+            // 初始化角色手机的主题
+            const characterPhoneScreen = document.getElementById('character-phone-screen');
+            if (characterPhoneScreen && savedTheme === 'light') {
+                characterPhoneScreen.classList.add('light-theme');
             }
 
             const savedWallpaper = loadData('saved_wallpaper');
@@ -19618,6 +21915,16 @@ ${chatHistoryForPrompt}
             // 如果当前在群聊界面，也需要刷新以应用新主题
             if (currentGroupId && !$('#group-chat-screen').classList.contains('hidden')) {
                  renderGroupChatHistory(currentGroupId);
+            }
+
+            // 同步角色手机的主题
+            const characterPhoneScreen = document.getElementById('character-phone-screen');
+            if (characterPhoneScreen) {
+                if (theme === 'light') {
+                    characterPhoneScreen.classList.add('light-theme');
+                } else {
+                    characterPhoneScreen.classList.remove('light-theme');
+                }
             }
         }
         
@@ -33349,6 +35656,320 @@ function addNewEventListeners() {
         // 声明剧场相关函数，确保在DOMContentLoaded中可以调用
         let renderScriptList, saveScript, showScriptEditScreen, startScenario;
 
+        // ====== 【【新增】】角色手机查看功能 ======
+        /**
+         * 打开角色手机 - 角色选择页面
+         */
+        function openCharacterPhoneSelection() {
+            console.log('Function: openCharacterPhoneSelection');
+            const listContainer = document.getElementById('character-phone-select-list');
+            if (!listContainer) {
+                console.error('Error: Cannot find element #character-phone-select-list');
+                return;
+            }
+            listContainer.innerHTML = '';
+
+            if (typeof characters !== 'undefined' && Array.isArray(characters) && characters.length > 0) {
+                console.log(`Rendering ${characters.length} characters for phone selection`);
+                characters.forEach(char => {
+                    if (!char || !char.id || !char.name) {
+                        console.warn('Skipping invalid character data:', char);
+                        return;
+                    }
+                    const item = document.createElement('div');
+                    item.className = 'wechat-list-item cursor-pointer';
+
+                    const uniqueAvatarId = `phone-select-avatar-${char.id}`;
+                    const avatarContent = `<div class="w-12 h-12 rounded-full bg-zinc-600 flex-shrink-0 flex items-center justify-center"><i class="ri-user-line text-xl"></i></div>`;
+
+                    item.innerHTML = `
+                        <div class="avatar mr-4" id="${uniqueAvatarId}">
+                            ${avatarContent}
+                        </div>
+                        <div class="flex-grow overflow-hidden">
+                             <h4 class="font-semibold text-base">${char.name}</h4>
+                        </div>
+                        <i class="fas fa-chevron-right text-gray-500"></i>
+                    `;
+
+                    if (char.avatar) {
+                        getImageFromDB(char.avatar).then(blob => {
+                            const avatarElement = document.getElementById(uniqueAvatarId);
+                            const avatarDiv = avatarElement?.querySelector('div');
+                            if (avatarDiv && blob) {
+                                try {
+                                    avatarDiv.style.backgroundImage = `url(${URL.createObjectURL(blob)})`;
+                                    avatarDiv.style.backgroundSize = 'cover';
+                                    avatarDiv.style.backgroundPosition = 'center';
+                                    avatarDiv.innerHTML = '';
+                                } catch (e) {
+                                    console.error(`Error setting background image for ${char.id}:`, e);
+                                }
+                            }
+                        }).catch(error => console.error(`Failed to load avatar for ${char.name} (${char.id}):`, error));
+                    }
+
+                    item.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        console.log('Selected character:', char.name, char.id);
+                        loadCharacterPhone(char.id);
+                    });
+                    listContainer.appendChild(item);
+                });
+            } else {
+                console.log('No characters found or characters array is invalid.');
+                listContainer.innerHTML = '<p class="text-center text-gray-500 p-8">请先在"角色书"应用中创建角色。</p>';
+            }
+
+            showScreen('character-phone-select-screen');
+            console.log('Displayed character-phone-select-screen');
+        }
+
+        /**
+         * 加载并显示指定角色的手机界面 (包含真实 API 调用)
+         * @param {string} characterId 角色ID
+         */
+        async function loadCharacterPhone(characterId) {
+            console.log('Function: loadCharacterPhone, characterId:', characterId);
+            showMessageBox('正在查看中...');
+            currentViewingPhoneCharId = characterId; // 存储当前查看的角色ID
+
+            const character = characters.find(c => c.id === characterId);
+            if (!character) {
+                showMessageBox('错误：找不到角色信息');
+                showScreen('character-phone-select-screen');
+                console.error(`Character not found for ID: ${characterId}`);
+                return;
+            }
+
+            // --- 1. 获取静态数据 ---
+            const charName = character.name;
+
+            // 获取最近对话记录
+            const history = chatHistories[characterId]?.history || [];
+            const recentMessages = history
+                .filter(msg => msg.type === 'text' && msg.sender !== 'system' && !msg.content.startsWith('['))
+                .slice(-2);
+
+            let msg1Content = null;
+            let msg2Content = null;
+            let msg1Align = 'self-end';
+            let msg2Align = 'self-start';
+
+            if (recentMessages.length === 1) {
+                msg1Content = recentMessages[0].content;
+                msg1Align = recentMessages[0].sender === 'user' ? 'self-start' : 'self-end';
+            } else if (recentMessages.length >= 2) {
+                msg1Content = recentMessages[1].content;
+                msg1Align = recentMessages[1].sender === 'user' ? 'self-start' : 'self-end';
+                msg2Content = recentMessages[0].content;
+                msg2Align = recentMessages[0].sender === 'user' ? 'self-start' : 'self-end';
+            }
+            console.log('Recent messages:', { msg1Content, msg1Align, msg2Content, msg2Align });
+
+            // --- 2. UI 填充 (静态部分) ---
+            const phoneScreenElement = document.getElementById('character-phone-screen');
+            if (!phoneScreenElement) return;
+
+            // 更新角色名
+            const nameEl = phoneScreenElement.querySelector('#char-phone-name');
+            if (nameEl) nameEl.textContent = charName;
+
+            // 【【【修复：加载并居中头像】】】
+            const avatarWidget = phoneScreenElement.querySelector('.widget-avatar');
+            if (avatarWidget) {
+                avatarWidget.innerHTML = ''; // 清空旧图标
+                await loadAvatar(character.avatar, avatarWidget, charName.charAt(0));
+            }
+
+            // 更新聊天气泡 Widget
+            const chatWidget = phoneScreenElement.querySelector('#char-phone-chat-widget');
+            if (chatWidget) {
+                chatWidget.innerHTML = '';
+                if (msg2Content) {
+                    const bubble2 = document.createElement('div');
+                    bubble2.className = `widget-chat-bubble ${msg2Align}`;
+                    bubble2.textContent = msg2Content;
+                    chatWidget.appendChild(bubble2);
+                }
+                if (msg1Content) {
+                    const bubble1 = document.createElement('div');
+                    bubble1.className = `widget-chat-bubble ${msg1Align}`;
+                    bubble1.textContent = msg1Content;
+                    chatWidget.appendChild(bubble1);
+                }
+                if (!msg1Content && !msg2Content) {
+                    chatWidget.innerHTML = '<p class="text-xs text-gray-400 text-center">最近没有聊天记录</p>';
+                }
+            }
+
+            // 更新备忘录 Widget (先显示加载中)
+            const memoList = phoneScreenElement.querySelector('#char-phone-memo-list');
+            if (memoList) {
+                memoList.innerHTML = `
+                    <div class="memo-line">
+                        <span class="memo-icon"><i class="fas fa-spinner fa-spin"></i></span>
+                        <span class="memo-text">正在生成备忘录...</span>
+                    </div>
+                `;
+            }
+
+            // 更新定位 (先显示加载中)
+            const locationEl = phoneScreenElement.querySelector('#char-phone-location');
+            if (locationEl) locationEl.textContent = '正在定位...';
+
+            // 【【新增：加载保存的壁纸】】
+            const wallpaperEl = document.getElementById('char-phone-wallpaper');
+            if (wallpaperEl) {
+                const savedWallpaperId = loadData(`char_wallpaper_${characterId}`);
+                if (savedWallpaperId) {
+                    try {
+                        const wallpaperBlob = await getImageFromDB(savedWallpaperId);
+                        if (wallpaperBlob) {
+                            const objectURL = URL.createObjectURL(wallpaperBlob);
+                            wallpaperEl.style.backgroundImage = `url(${objectURL})`;
+                            console.log(`Loaded custom wallpaper for character ${characterId}`);
+                        }
+                    } catch (error) {
+                        console.error('Failed to load character wallpaper:', error);
+                    }
+                } else {
+                    // 恢复默认壁纸（根据主题）
+                    const isLightTheme = phoneScreenElement.classList.contains('light-theme');
+                    if (isLightTheme) {
+                        wallpaperEl.style.backgroundImage = "url('https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=2147&auto=format&fit=crop')";
+                        wallpaperEl.style.filter = "grayscale(0%) brightness(1.1)";
+                    } else {
+                        wallpaperEl.style.backgroundImage = "url('https://images.unsplash.com/photo-1505909182942-e2f09aee3e89?q=80&w=2147&auto=format&fit=crop')";
+                        wallpaperEl.style.filter = "grayscale(100%)";
+                    }
+                }
+            }
+
+            // --- 3. 显示页面 ---
+            showScreen('character-phone-screen');
+            console.log('Displayed character-phone-screen, now fetching API data...');
+
+            // --- 4. 异步调用 API (获取位置和备忘录) ---
+            let charLocation = "虚拟定位..."; // 默认值
+            let memoItems = [];
+            try {
+                const apiSettings = loadData('api_settings');
+                if (!apiSettings || !apiSettings.url || !apiSettings.key || !apiSettings.model) {
+                    throw new Error("API 未配置");
+                }
+                if (!loadData('api_enabled', false)) {
+                    throw new Error("API 连接已关闭");
+                }
+
+                const userName = loadData('perch_username') || '你';
+                // 【【新 Prompt：同时请求位置和备忘录】】
+                const memoPrompt = `
+身份
+你将扮演角色 ${character.name} (人设: ${character.persona})。
+
+任务
+根据你和 ${userName} (我们的关系: ${character.myPersona}) 的[最近互动参考]，生成两项数据：
+1. location: 一个符合你人设和近期事件的、简短的"当前虚拟位置"（必须控制在7个字以内，包括标点符号）。
+2. memo: 3 条你写在手机备忘录里的、想要为对方做的事情（每条控制在16字左右）。
+
+输出格式 (严格遵守 JSON 格式)
+\`\`\`json
+{
+  "location": "市中心咖啡馆",
+  "memo": [
+    "为TA准备一个浪漫的生日惊喜",
+    "预约下周末我们最喜欢的餐厅",
+    "去书店买一本TA想看的小说"
+  ]
+}
+\`\`\`
+
+最近互动参考
+${recentMessages.map(m => `${m.sender === 'user' ? userName : character.name}: ${m.content}`).join('\n')}
+`;
+
+                const aiMemoResponse = await callAI(memoPrompt, "生成位置和备忘录");
+
+                if (aiMemoResponse) {
+                    // 提取 JSON
+                    const jsonMatch = aiMemoResponse.match(/```json([\s\S]*?)```/);
+                    if (!jsonMatch) throw new Error("AI 返回内容非 JSON 格式。");
+                    
+                    const data = JSON.parse(jsonMatch[1]);
+                    charLocation = data.location || "信号不稳定...";
+                    memoItems = data.memo || [];
+                    if (memoItems.length === 0) memoItems = ["还没有计划..."];
+                } else {
+                    throw new Error("AI 返回内容为空");
+                }
+            } catch (error) {
+                console.error("生成备忘录/位置失败:", error);
+                charLocation = "定位失败";
+                memoItems = [`（备忘录加载失败: ${error.message}）`];
+                showMessageBox(`数据加载失败: ${error.message}`);
+            }
+            console.log("API data received:", { charLocation, memoItems });
+
+            // --- 5. 再次更新 UI (用 API 返回的数据) ---
+            if (locationEl) locationEl.textContent = charLocation;
+            
+            if (memoList) {
+                memoList.innerHTML = ''; // 清空加载中
+                if (memoItems.length > 0) {
+                    memoItems.forEach(itemText => {
+                        const memoLine = document.createElement('div');
+                        memoLine.className = 'memo-line';
+                        memoLine.innerHTML = `
+                            <span class="memo-icon">☆</span>
+                            <span class="memo-text">${itemText}</span>
+                        `;
+                        memoList.appendChild(memoLine);
+                    });
+                } else {
+                    memoList.innerHTML = '<p class="text-xs text-gray-400 text-center">备忘录是空的</p>';
+                }
+            }
+            console.log("Memo list updated with API data.");
+        }
+
+        /**
+         * 更新角色手机状态栏的时间
+         */
+        function updateCharPhoneTime() {
+            const timeEl = document.getElementById('char-phone-currentTime');
+            if (timeEl) {
+                const now = new Date();
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                timeEl.textContent = `${hours}:${minutes}`;
+            }
+        }
+
+        /**
+         * 显示角色手机内部的消息提示
+         * @param {string} message 提示内容
+         */
+        function showCharPhoneMessageBox(message) {
+            const box = document.getElementById('char-phone-message-box');
+            if (!box) {
+                console.error("未找到 #char-phone-message-box 元素");
+                return;
+            }
+            box.textContent = message;
+            box.classList.remove('opacity-0', 'scale-90');
+            box.classList.add('opacity-100', 'scale-100');
+            if (box.timeoutId) {
+                clearTimeout(box.timeoutId);
+            }
+            box.timeoutId = setTimeout(() => {
+                box.classList.remove('opacity-100', 'scale-100');
+                box.classList.add('opacity-0', 'scale-90');
+                box.timeoutId = null;
+            }, 1500);
+        }
+        // ====== 角色手机查看功能 END ======
+
         // 初始化與事件監聽器
         document.addEventListener('DOMContentLoaded', async () => {
             await loadAllSavedData();
@@ -33375,7 +35996,8 @@ function addNewEventListeners() {
             updateTime();
             setInterval(updateTime, 60000);
             
-
+            // 初始化角色手机 App 返回按钮
+            setupCharPhoneAppBackButton();
 
             // 加载朋友圈背景和用户信息
             loadMomentsCover();
@@ -33694,6 +36316,10 @@ function addNewEventListeners() {
                     }
                     else if (appName === "世界书") { renderWorldBookList(); showScreen('world-book-list-screen'); }
                     else if (appName === "角色书") { renderCharacterBookList(); showScreen('character-book-list-screen'); }
+                    else if (appName === "ViewPhone") {
+                        console.log('ViewPhone icon handler triggered');
+                        openCharacterPhoneSelection();
+                    }
                                             else if (appName === "设置") showScreen('main-settings-screen');
                         else if (appName === "栖木") {
                             renderPerchFeed();
@@ -33765,6 +36391,82 @@ function addNewEventListeners() {
                     }
                 }
             });
+
+            // 角色手机相关按钮事件监听器
+            $('#character-phone-select-back-button').addEventListener('click', () => {
+                console.log('Character phone select back button clicked');
+                showScreen('home-screen');
+                const pagesContainer = document.getElementById('home-pages-container');
+                if (pagesContainer) {
+                    pagesContainer.scrollTo({ left: pagesContainer.clientWidth, behavior: 'auto' });
+                }
+            });
+            
+            // 新的返回按钮（灰色毛玻璃上箭头）
+            $('#char-phone-exit-btn').addEventListener('click', () => {
+                console.log('Character phone exit button clicked');
+                openCharacterPhoneSelection();
+            });
+
+            // 为角色手机内的 App 图标添加点击提示 (使用事件委托)
+            const charPhoneContent = document.getElementById('character-phone-display-content');
+            if (charPhoneContent) {
+                charPhoneContent.addEventListener('click', (event) => {
+                    const icon = event.target.closest('.app-icon[data-char-app]');
+                    if (icon) {
+                        const appName = icon.dataset.charApp;
+                        console.log('Clicked character phone App:', appName);
+                        // showCharPhoneMessageBox(`正在打开 ${appName}...`); // 注释掉旧的提示
+
+                        // --- 添加新的 switch 语句处理不同 App ---
+                        if (!currentViewingPhoneCharId) {
+                            console.error("无法打开App，未知的角色ID");
+                            return;
+                        }
+                        switch (appName) {
+                            case '痕迹':
+                                openCharacterAppView('Traces', currentViewingPhoneCharId, renderTracesList);
+                                break;
+                            case '不要点开':
+                                openCharacterApp_DontOpen(currentViewingPhoneCharId);
+                                break;
+                            case '信件':
+                                openCharacterAppView('Letters', currentViewingPhoneCharId, renderLettersList);
+                                break;
+                            case '设置':
+                                openCharacterApp_Settings(currentViewingPhoneCharId);
+                                break;
+                            case '梦日志':
+                                openCharacterAppView('DreamDiary', currentViewingPhoneCharId, renderDreamDiaryList);
+                                break;
+                            case '商城':
+                                openCharacterAppView('Mall', currentViewingPhoneCharId, renderMallList);
+                                break;
+                            case '音乐':
+                                openCharacterAppView('Music', currentViewingPhoneCharId, renderMusicList);
+                                break;
+                            case '浏览器':
+                                openCharacterAppView('Browser', currentViewingPhoneCharId, renderBrowserHistoryList);
+                                break;
+                            case '微信':
+                                openCharacterApp_WeChat(currentViewingPhoneCharId);
+                                break;
+                            case '通讯录':
+                                openCharacterAppView('Contacts', currentViewingPhoneCharId, renderContactsList);
+                                break;
+                            case '通话记录':
+                                openCharacterAppView('CallLog', currentViewingPhoneCharId, renderCallLogList);
+                                break;
+                            default:
+                                showCharPhoneMessageBox(`${appName} 功能正在开发中...`);
+                        }
+                        // --- 新 switch 语句结束 ---
+                    }
+                });
+                console.log('Event listener added for character phone apps');
+            } else {
+                console.warn('Element #character-phone-display-content not found for app listener');
+            }
 
             $('#main-settings-back-button').addEventListener('click', () => showScreen('home-screen'));
             $('#api-settings-back-button').addEventListener('click', () => showScreen('main-settings-screen'));
@@ -43673,6 +46375,283 @@ ${wordGuessState.isFirstClue ?
         // 在页面加载后初始化群聊事件
         document.addEventListener('DOMContentLoaded', setupGroupChatEvents);
         // ====== 群聊事件绑定 END ======
+
+        // ====== 角色手机 iOS 主题切换功能 ======
+        /**
+         * 初始化角色手机主题切换功能
+         */
+        function initCharacterPhoneTheme() {
+            const phoneScreen = document.getElementById('character-phone-screen');
+            const statusBar = document.querySelector('#character-phone-screen #char-phone-status-bar');
+            
+            if (!phoneScreen || !statusBar) {
+                console.warn('角色手机元素未找到，无法初始化主题切换');
+                return;
+            }
+
+            // 从 localStorage 读取保存的主题设置
+            const savedTheme = localStorage.getItem('characterPhoneTheme') || 'dark';
+            if (savedTheme === 'light') {
+                phoneScreen.classList.add('light-theme');
+            }
+
+            // 点击状态栏右侧的太阳/月亮图标切换主题
+            statusBar.addEventListener('click', (e) => {
+                // 检查点击位置是否在右侧区域（图标所在位置）
+                const rect = statusBar.getBoundingClientRect();
+                const clickX = e.clientX - rect.left;
+                const clickFromRight = rect.width - clickX;
+                
+                // 如果点击位置距离右边缘小于 60px，则触发主题切换
+                if (clickFromRight < 60) {
+                    toggleCharacterPhoneTheme();
+                }
+            });
+
+            console.log('角色手机主题切换功能已初始化，当前主题:', savedTheme);
+        }
+
+        /**
+         * 切换角色手机主题
+         */
+        function toggleCharacterPhoneTheme() {
+            const phoneScreen = document.getElementById('character-phone-screen');
+            if (!phoneScreen) return;
+
+            const isLightTheme = phoneScreen.classList.contains('light-theme');
+            
+            if (isLightTheme) {
+                // 切换到黑夜模式
+                phoneScreen.classList.remove('light-theme');
+                localStorage.setItem('characterPhoneTheme', 'dark');
+                console.log('已切换到黑夜模式');
+            } else {
+                // 切换到白天模式
+                phoneScreen.classList.add('light-theme');
+                localStorage.setItem('characterPhoneTheme', 'light');
+                console.log('已切换到白天模式');
+            }
+        }
+
+        // 页面加载时初始化主题
+        document.addEventListener('DOMContentLoaded', () => {
+            // 延迟执行以确保 DOM 完全加载
+            setTimeout(initCharacterPhoneTheme, 500);
+        });
+
+        // 当打开角色手机时也尝试初始化（防止动态加载的情况）
+        const originalOpenCharacterPhone = window.openCharacterPhoneSelection;
+        if (originalOpenCharacterPhone) {
+            window.openCharacterPhoneSelection = function() {
+                originalOpenCharacterPhone.apply(this, arguments);
+                setTimeout(initCharacterPhoneTheme, 300);
+            };
+        }
+        // ====== 角色手机 iOS 主题切换功能 END ======
+
+        // ====== 角色手机弹窗创建辅助函数 ======
+        /**
+         * 创建一个精美的iOS风格弹窗
+         * @param {Object} options - 配置选项
+         * @param {string} options.title - 弹窗标题
+         * @param {string} options.content - 弹窗内容（HTML或文本）
+         * @param {Array} options.buttons - 按钮配置数组 [{text: '确定', type: 'primary', onClick: function}]
+         * @param {string} options.id - 弹窗ID（可选，默认自动生成）
+         * @returns {HTMLElement} 返回创建的弹窗元素
+         */
+        function createCharacterPhoneModal(options = {}) {
+            const {
+                title = '提示',
+                content = '',
+                buttons = [{text: '确定', type: 'primary'}],
+                id = 'char-phone-modal-' + Date.now()
+            } = options;
+
+            // 检查是否已存在同ID的弹窗
+            let existingModal = document.getElementById(id);
+            if (existingModal) {
+                existingModal.remove();
+            }
+
+            // 创建弹窗容器
+            const modalOverlay = document.createElement('div');
+            modalOverlay.id = id;
+            modalOverlay.className = 'modal-overlay';
+            
+            const modalContent = document.createElement('div');
+            modalContent.className = 'modal-content';
+            
+            // 创建头部
+            const modalHeader = document.createElement('div');
+            modalHeader.className = 'modal-content-header';
+            modalHeader.innerHTML = `<h3>${title}</h3>`;
+            
+            // 创建主体内容
+            const modalBody = document.createElement('div');
+            modalBody.className = 'modal-content-body';
+            
+            // 如果内容是字符串，自动包装在段落中
+            if (typeof content === 'string') {
+                // 检查是否已经是HTML（包含HTML标签）
+                if (content.trim().match(/<[^>]+>/)) {
+                    modalBody.innerHTML = content;
+                } else {
+                    // 纯文本，按段落分割
+                    const paragraphs = content.split('\n\n').filter(p => p.trim());
+                    paragraphs.forEach(para => {
+                        const p = document.createElement('p');
+                        p.textContent = para.trim();
+                        modalBody.appendChild(p);
+                    });
+                }
+            } else if (content instanceof HTMLElement) {
+                modalBody.appendChild(content);
+            }
+            
+            // 创建底部按钮区
+            const modalFooter = document.createElement('div');
+            modalFooter.className = 'modal-content-footer';
+            
+            buttons.forEach(btn => {
+                const button = document.createElement('button');
+                button.textContent = btn.text || '按钮';
+                button.className = btn.type || 'secondary';
+                
+                button.onclick = function() {
+                    if (typeof btn.onClick === 'function') {
+                        btn.onClick(modalOverlay);
+                    } else {
+                        // 默认行为：关闭弹窗
+                        closeCharacterPhoneModal(id);
+                    }
+                };
+                
+                modalFooter.appendChild(button);
+            });
+            
+            // 组装弹窗
+            modalContent.appendChild(modalHeader);
+            modalContent.appendChild(modalBody);
+            modalContent.appendChild(modalFooter);
+            modalOverlay.appendChild(modalContent);
+            
+            // 添加到角色手机屏幕内
+            const phoneScreen = document.getElementById('character-phone-screen');
+            if (phoneScreen) {
+                phoneScreen.appendChild(modalOverlay);
+            } else {
+                console.warn('角色手机屏幕未找到，弹窗已添加到body');
+                document.body.appendChild(modalOverlay);
+            }
+            
+            return modalOverlay;
+        }
+
+        /**
+         * 显示角色手机弹窗
+         * @param {string} modalId - 弹窗ID
+         */
+        function showCharacterPhoneModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.add('visible');
+                console.log('弹窗已显示:', modalId);
+            }
+        }
+
+        /**
+         * 关闭角色手机弹窗
+         * @param {string} modalId - 弹窗ID
+         */
+        function closeCharacterPhoneModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.remove('visible');
+                // 延迟移除DOM元素，等待动画完成
+                setTimeout(() => {
+                    if (modal.parentNode) {
+                        modal.remove();
+                    }
+                }, 300);
+                console.log('弹窗已关闭:', modalId);
+            }
+        }
+
+        /**
+         * 快捷方法：显示简单的提示弹窗
+         * @param {string} title - 标题
+         * @param {string} content - 内容
+         * @param {Function} onConfirm - 确认回调
+         */
+        function showCharacterPhoneAlert(title, content, onConfirm) {
+            const modal = createCharacterPhoneModal({
+                title: title,
+                content: content,
+                buttons: [{
+                    text: '确定',
+                    type: 'primary',
+                    onClick: function(modalEl) {
+                        closeCharacterPhoneModal(modalEl.id);
+                        if (typeof onConfirm === 'function') {
+                            onConfirm();
+                        }
+                    }
+                }]
+            });
+            showCharacterPhoneModal(modal.id);
+            return modal;
+        }
+
+        /**
+         * 快捷方法：显示确认对话框
+         * @param {string} title - 标题
+         * @param {string} content - 内容
+         * @param {Function} onConfirm - 确认回调
+         * @param {Function} onCancel - 取消回调
+         */
+        function showCharacterPhoneConfirm(title, content, onConfirm, onCancel) {
+            const modal = createCharacterPhoneModal({
+                title: title,
+                content: content,
+                buttons: [
+                    {
+                        text: '取消',
+                        type: 'secondary',
+                        onClick: function(modalEl) {
+                            closeCharacterPhoneModal(modalEl.id);
+                            if (typeof onCancel === 'function') {
+                                onCancel();
+                            }
+                        }
+                    },
+                    {
+                        text: '确定',
+                        type: 'primary',
+                        onClick: function(modalEl) {
+                            closeCharacterPhoneModal(modalEl.id);
+                            if (typeof onConfirm === 'function') {
+                                onConfirm();
+                            }
+                        }
+                    }
+                ]
+            });
+            showCharacterPhoneModal(modal.id);
+            return modal;
+        }
+
+        // 将函数暴露到全局，方便其他代码调用
+        window.createCharacterPhoneModal = createCharacterPhoneModal;
+        window.showCharacterPhoneModal = showCharacterPhoneModal;
+        window.closeCharacterPhoneModal = closeCharacterPhoneModal;
+        window.showCharacterPhoneAlert = showCharacterPhoneAlert;
+        window.showCharacterPhoneConfirm = showCharacterPhoneConfirm;
+
+        console.log('角色手机弹窗系统已初始化！');
+        console.log('使用示例：');
+        console.log('showCharacterPhoneAlert("提示", "这是一个测试弹窗");');
+        console.log('showCharacterPhoneConfirm("确认", "你确定要执行此操作吗？", () => console.log("已确认"));');
+        // ====== 角色手机弹窗创建辅助函数 END ======
 
     </script>
 
