@@ -24046,6 +24046,10 @@ if (type === 'image') {
                 // V23.0 新增：获取并格式化当前时间
                 const currentTimeString = new Date().toLocaleString('zh-CN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 
+                // 【【【【【 这是你需要修改的地方 (Mod 1) 】】】】】
+                // 1. 在构建 systemPrompt 之前，先准备好 *给Prompt看* 的聊天记录
+                const chatHistoryForPrompt = chatHistory.filter(m => m.type !== 'system-internal' && m.type !== 'system-memory');
+
                 // 【【新增】】游戏状态检查
                 let systemPrompt;
                 
@@ -24083,7 +24087,7 @@ if (type === 'image') {
 [与我的关系]: ${character.myPersona}
 [我们的共同记忆 (来自记忆胶囊)]: ${memoryContext}
 [世界观背景]: ${worldBookContext}
-[最近聊天回顾]: ${chatHistory.map(m => `${m.sender === 'user' ? '对方' : '我'}: ${m.content}`).join('\n')}
+[最近聊天回顾]: ${chatHistoryForPrompt.map(m => `${m.sender === 'user' ? '对方' : '我'}: ${m.content}`).join('\n')}
 ---
 `;
                     } else {
@@ -24116,7 +24120,7 @@ if (type === 'image') {
 [与我的关系]: ${character.myPersona}
 [我们的共同记忆 (来自记忆胶囊)]: ${memoryContext}
 [世界观背景]: ${worldBookContext}
-[最近聊天回顾]: ${chatHistory.map(m => `${m.sender === 'user' ? '对方' : '我'}: ${m.content}`).join('\n')}
+[最近聊天回顾]: ${chatHistoryForPrompt.map(m => `${m.sender === 'user' ? '对方' : '我'}: ${m.content}`).join('\n')}
 ---
 `;
                     }
@@ -24392,8 +24396,11 @@ ${moduleStyleContext || "无"}
                                 content = `[系统提示：${msg.content.summary}]`;
                             }
                             
-                            // 处理系统消息
-                            if (msg.sender === 'system') {
+                            // 4. 【【关键】】在这里处理 system-internal 消息
+                            if (msg.sender === 'system' && (msg.type === 'system-internal' || msg.type === 'system-memory')) {
+                                role = 'user'; // 将系统内部指令伪装成"用户"的指令
+                                // content 已经是指令内容了，不需要加 [系统提示:]
+                            } else if (msg.sender === 'system') { // 处理普通的系统消息
                                 role = 'user';
                                 content = `[系统提示: ${content}]`;
                             }
@@ -24601,7 +24608,11 @@ ${moduleStyleContext || "无"}
                         
                         // 处理其他所有类型的文本消息
                         let content = currentContent; // 使用处理过的内容
-                        if (msg.sender === 'system') {
+                        // 6. 【【关键】】在这里处理 system-internal 消息
+                        if (msg.sender === 'system' && (msg.type === 'system-internal' || msg.type === 'system-memory')) {
+                            role = 'user'; // 将系统内部指令伪装成"用户"的指令
+                            // content 已经是指令内容了，不需要加 [系统提示:]
+                        } else if (msg.sender === 'system') { // 处理普通的系统消息
                             role = 'user';
                             content = `[系统提示: ${currentContent}]`;
                         }
@@ -26874,7 +26885,26 @@ const systemPrompt = `
                 const chatSession = chatHistories[currentChatCharacterId];
             
             if (!chatSession || chatSession.history.length === 0) {
-                const initialPrompt = { content: '[用户按下了接收键，请你作为角色主动开启一段对话。]', type: 'text' };
+                // 【【【这就是你要添加/修改的地方】】】
+                // 1. 创建一个系统内部指令
+                const initialPrompt = { 
+                    content: '[用户按下了接收键，请你作为角色主动开启一段对话。]', 
+                    sender: 'system', // 标记为系统
+                    type: 'system-internal', // 标记为内部指令（不会显示在UI上）
+                    timestamp: Date.now() 
+                };
+
+                // 2. 确保历史记录数组存在
+                if (!chatHistories[currentChatCharacterId]) {
+                    chatHistories[currentChatCharacterId] = { history: [], pinned: false };
+                }
+
+                // 3. 【关键】将这个指令添加到聊天记录中
+                chatHistories[currentChatCharacterId].history.push(initialPrompt);
+                // 4. 【关键】保存这个修改
+                saveData('chatHistories', chatHistories);
+
+                // 5. 现在再调用 getAIResponse，它就能读到这条指令了
                 await getAIResponse();
                 return; 
             }
@@ -26971,11 +27001,22 @@ ${transcriptText}
                 await getAIResponse();
             } else {
                 // 否则（包括AI最后发言、系统消息、或任何其他情况），都让AI主动继续对话
-                const character = characters.find(c => c.id === currentChatCharacterId);
+
+                // 【【【这也是你要添加/修改的地方】】】
+                // 1. 创建一个系统内部指令
                 const continuePrompt = {
                     content: `[用户按下了接收键，但你没有收到新的消息。请根据你的角色设定和当前对话上下文（特别是最后一条系统消息，如果有的话），主动继续对话。]`,
-                    type: 'text'
+                    sender: 'system', // 标记为系统
+                    type: 'system-internal', // 标记为内部指令（不会显示在UI上）
+                    timestamp: Date.now()
                 };
+
+                // 2. 【关键】将这个指令添加到聊天记录中
+                chatHistories[currentChatCharacterId].history.push(continuePrompt);
+                // 3. 【关键】保存这个修改
+                saveData('chatHistories', chatHistories);
+
+                // 4. 现在再调用 getAIResponse，它就能读到这条指令了
                 await getAIResponse();
             }
         } catch (error) {
