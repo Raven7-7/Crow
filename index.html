@@ -12650,6 +12650,149 @@
             border-color: rgba(147, 197, 253, 0.4);
         }
 
+        /* 【【新增】】信件回复区域样式 */
+        .letter-replies-section {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 2px dashed #D2B48C;
+        }
+        .dark-mode .letter-replies-section {
+            border-top-color: #6a5a4a;
+        }
+        
+        .letter-reply-item {
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            animation: replyFadeIn 0.5s ease-out;
+        }
+        
+        @keyframes replyFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .letter-reply-item.user-reply {
+            background: rgba(139, 115, 85, 0.1);
+            border-left: 4px solid #a67c52;
+            margin-left: 2rem;
+        }
+        
+        .letter-reply-item.character-reply {
+            background: rgba(218, 165, 140, 0.1);
+            border-left: 4px solid #d4a373;
+            margin-right: 2rem;
+        }
+        
+        .dark-mode .letter-reply-item.user-reply {
+            background: rgba(100, 116, 139, 0.15);
+            border-left-color: #64748b;
+        }
+        
+        .dark-mode .letter-reply-item.character-reply {
+            background: rgba(218, 165, 140, 0.15);
+            border-left-color: #d4a373;
+        }
+        
+        .letter-reply-header {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .letter-reply-sender {
+            color: #8B0000;
+        }
+        
+        .character-reply .letter-reply-sender {
+            color: #eab308;
+        }
+        
+        .letter-reply-time {
+            font-size: 0.75rem;
+            color: #999;
+        }
+        
+        .letter-reply-content {
+            white-space: pre-wrap;
+            line-height: 1.7;
+        }
+        
+        .letter-reply-input-section {
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(210, 180, 140, 0.5);
+        }
+        
+        .dark-mode .letter-reply-input-section {
+            border-top-color: rgba(106, 90, 74, 0.5);
+        }
+        
+        .letter-reply-input {
+            width: 100%;
+            min-height: 100px;
+            padding: 0.75rem;
+            border: 1px solid #D2B48C;
+            border-radius: 0.5rem;
+            background: rgba(255, 255, 255, 0.5);
+            font-family: 'Noto Serif SC', serif;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            resize: vertical;
+            transition: all 0.3s ease;
+        }
+        
+        .dark-mode .letter-reply-input {
+            background: rgba(0, 0, 0, 0.3);
+            border-color: #6a5a4a;
+            color: #dcd3c4;
+        }
+        
+        .letter-reply-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .letter-reply-btn {
+            margin-top: 0.75rem;
+            padding: 0.5rem 1.5rem;
+            background: linear-gradient(135deg, #a67c52 0%, #8b6f47 100%);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .letter-reply-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(166, 124, 82, 0.4);
+        }
+        
+        .letter-reply-btn:active {
+            transform: translateY(0);
+        }
+        
+        .letter-reply-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
         /* ====== 【【新增 V2.0】】群聊专属样式 START ====== */
 
         /* 群聊列表页的"创建"引导卡片 */
@@ -23965,8 +24108,8 @@ if (type === 'image') {
                     return;
                 }
 
-                // --- 从上下文中解构出新增的 planContext 和 callLogContext ---
-                const { character, chatHistory, worldBookContext, recentMoments, planContext, callLogContext, memoryContext, groupChatContext } = context;
+                // --- 从上下文中解构出新增的 planContext、callLogContext 和 letterContext ---
+                const { character, chatHistory, worldBookContext, recentMoments, planContext, callLogContext, memoryContext, groupChatContext, letterContext } = context;
                 // -----------------------------------------
 
                 // ====== 【【在这里添加新代码】】根据模式动态生成格式指令 ======
@@ -24204,6 +24347,7 @@ ${formattingInstruction}
 - **查阅优先原则**: 当我向你提出关于我们过去经历的问题时（例如"我们什么时候..."、"你还记得...吗？"、"我们约定了什么？"），你的【第一要务】是去[记忆回顾]模块中寻找准确答案。
 - **事实性回答**: 在回答这类问题时，你必须优先保证【事实的准确性】。你需要根据[记忆回顾]中的"事件"和"标题"来直接、清晰地回答我的问题。
 - **避免再创作**: 在回答关于过去事实的问题时，【绝对禁止】将我的提问本身视为一个新的创作灵感。你的任务是"回忆"，而不是"想象"。
+- **【【信箱往来记忆】】**: 在下方[信箱往来记忆]模块中，你可以看到我们通过"信箱"功能往来的所有书信内容。这些信件是我们情感交流的重要组成部分，你必须完全记住这些信件的内容，包括每封信的标题、内容以及我们在信中的来往回复。当我在微信聊天中提到信件相关的话题时（例如"你还记得你那封信里写的...吗？"、"我们在信里不是说好了..."），你需要准确地回忆起对应的信件内容并作出回应。信件中的约定、承诺、情感表达都是真实存在的记忆，你需要将其作为我们关系发展的重要里程碑来对待。
 
 # 【【新增模块：回复/引用规则】】
 当用户的消息格式为 [回复你的"原文"] 新消息内容 时，这代表用户正在引用你之前说的某一句话。你的回应必须紧密围绕被引用的"原文"和用户的新问题/评论展开，展现出连贯的对话能力和对上下文的理解。
@@ -24273,6 +24417,8 @@ ${formattingInstruction}
 ${groupChatContext}
 - **【【私聊记忆回顾】】 (Private Chat Memory)**:
 ${memoryContext}
+- **【【信箱往来记忆】】 (Letter Correspondence Memory)**:
+${letterContext}
 - **我们的世界观背景**: ${worldviewContext || "无"}
 - **你的专属行为准则 (来自"输入规范"世界书)**: ${rulesContext || "无"}
 - **你最近的朋友圈动态**: ${recentMoments}
@@ -29566,6 +29712,37 @@ ${moment.image ? `配图描述: ${moment.image_desc}` : ''}
                 }
                 // ================= 【 V9.1 新增代码块 END 】 =================
 
+                // ============ 【【【【【 新增代码块：信箱记忆收集 START 】】】】】 ============
+                // 收集该角色的所有信件往来
+                let letterContext = '';
+                const characterLetters = mailData[characterId] || [];
+                
+                if (characterLetters.length > 0) {
+                    // 只取最近的5封信件（可以根据需求调整）
+                    const recentLetters = characterLetters.slice(-5);
+                    
+                    letterContext = recentLetters.map(letter => {
+                        let letterText = `[信件标题：${letter.title}]\n`;
+                        letterText += `[信件内容]\n${letter.content}\n`;
+                        
+                        // 如果有回复往来，也加入上下文
+                        if (letter.replies && letter.replies.length > 0) {
+                            letterText += `\n[往来回复]\n`;
+                            letter.replies.forEach((reply, index) => {
+                                const sender = reply.sender === 'user' ? '用户' : character.name;
+                                letterText += `${sender}：${reply.content}\n\n`;
+                            });
+                        }
+                        
+                        return letterText;
+                    }).join('\n---分隔线---\n\n');
+                    
+                    letterContext = `--- 信箱往来记忆 ---\n${letterContext}`;
+                } else {
+                    letterContext = '（还没有收到过信件）';
+                }
+                // ================= 【 信箱记忆收集 END 】 =================
+
                 const contextPackage = {
                     character: character,
                     chatHistory: limitedHistory,
@@ -29577,7 +29754,8 @@ ${moment.image ? `配图描述: ${moment.image_desc}` : ''}
                     // --- 在这里添加新属性 ---
                     callLogContext: callLogContext,
                     memoryContext: memoryContext,
-                    groupChatContext: groupChatContext // <-- 【【新增这一行】】
+                    groupChatContext: groupChatContext, // <-- 【【新增这一行】】
+                    letterContext: letterContext // <-- 【【新增：信箱记忆】】
                     // -----------------------
                 };
 
@@ -45977,13 +46155,82 @@ function viewLetter(characterId, letterId) {
     currentMailCharacterId = characterId;
     currentLetterId = letterId;
 
+    // 确保信件有replies数组
+    if (!letter.replies) {
+        letter.replies = [];
+    }
+
+    const character = characters.find(c => c.id === characterId);
+    const characterName = character ? character.name : '角色';
+    
+    // 获取栖木用户名
+    const perchUsername = loadData('perch_username') || '我的名字';
+
     const contentWrapper = $('#letter-view-content');
+    
+    // 构建回复列表HTML
+    let repliesHTML = '';
+    if (letter.replies && letter.replies.length > 0) {
+        repliesHTML = `
+            <div class="letter-replies-section">
+                <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 1.5rem; color: #999;"><i class="fas fa-envelope-open-text" style="margin-right: 0.5rem;"></i>来往信件</h3>
+                ${letter.replies.map(reply => {
+                    const isUser = reply.sender === 'user';
+                    const senderName = isUser ? perchUsername : characterName;
+                    const replyClass = isUser ? 'user-reply' : 'character-reply';
+                    return `
+                        <div class="letter-reply-item ${replyClass}">
+                            <div class="letter-reply-header">
+                                <span class="letter-reply-sender">${senderName}</span>
+                                <span class="letter-reply-time">${new Date(reply.timestamp).toLocaleString()}</span>
+                            </div>
+                            <div class="letter-reply-content">${reply.content.replace(/\n/g, '<br>')}</div>
+                        </div>
+                    `;
+                }).join('')}
+            </div>
+        `;
+    }
+    
     contentWrapper.innerHTML = `
         <h2 class="letter-title">${letter.title}</h2>
         <p class="letter-date">${new Date(letter.timestamp).toLocaleDateString()}</p>
         <div class="letter-body">${letter.content.replace(/\n/g, '<br>')}</div>
+        
+        ${repliesHTML}
+        
+        <div class="letter-reply-input-section">
+            <h3 style="font-size: 0.95rem; font-weight: 600; margin-bottom: 0.75rem;"><i class="fas fa-feather-alt" style="margin-right: 0.5rem;"></i>写封回信</h3>
+            <textarea 
+                id="letter-reply-input" 
+                class="letter-reply-input" 
+                placeholder="在这里写下你的回信..."></textarea>
+            <button id="send-letter-reply-btn" class="letter-reply-btn">
+                <i class="fas fa-paper-plane"></i>
+                <span>寄出</span>
+            </button>
+        </div>
     `;
+    
     showScreen('letter-view-screen');
+    
+    // 滚动到底部以显示输入框
+    setTimeout(() => {
+        const wrapper = $('#letter-view-content-wrapper');
+        wrapper.scrollTop = wrapper.scrollHeight;
+    }, 100);
+    
+    // 绑定发送按钮事件
+    const sendBtn = $('#send-letter-reply-btn');
+    sendBtn.addEventListener('click', () => sendLetterReply(characterId, letterId));
+    
+    // 支持Ctrl+Enter发送
+    const replyInput = $('#letter-reply-input');
+    replyInput.addEventListener('keydown', (e) => {
+        if (e.ctrlKey && e.key === 'Enter') {
+            sendLetterReply(characterId, letterId);
+        }
+    });
 }
 
 /**
@@ -46114,6 +46361,177 @@ ${context.memoryContext}
         showMessageBox("信件在邮寄过程中好像丢失了...");
     } finally {
         icon.classList.remove('animate-spin'); // 无论成功失败，都停止旋转
+    }
+}
+
+/**
+ * 发送用户的回信
+ * @param {string} characterId - 角色ID
+ * @param {string} letterId - 信件ID
+ */
+async function sendLetterReply(characterId, letterId) {
+    const replyInput = $('#letter-reply-input');
+    const sendBtn = $('#send-letter-reply-btn');
+    const replyContent = replyInput.value.trim();
+    
+    if (!replyContent) {
+        showMessageBox("请先写点什么吧！");
+        return;
+    }
+    
+    const letter = mailData[characterId]?.find(l => l.id === letterId);
+    if (!letter) return;
+    
+    // 禁用输入框和按钮
+    replyInput.disabled = true;
+    sendBtn.disabled = true;
+    sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>寄出中...</span>';
+    
+    try {
+        // 添加用户回复
+        const userReply = {
+            sender: 'user',
+            content: replyContent,
+            timestamp: Date.now()
+        };
+        
+        if (!letter.replies) {
+            letter.replies = [];
+        }
+        letter.replies.push(userReply);
+        
+        // 保存数据
+        saveData('mailData', mailData);
+        
+        // 清空输入框
+        replyInput.value = '';
+        
+        // 重新渲染信件详情以显示新回复
+        viewLetter(characterId, letterId);
+        
+        // 显示提示
+        showMessageBox("回信已寄出！");
+        
+        // 自动生成角色的回复
+        await generateCharacterLetterReply(characterId, letterId);
+        
+    } catch (error) {
+        console.error("发送回复失败:", error);
+        showMessageBox("回信寄送失败，请重试。");
+        // 恢复输入框和按钮
+        replyInput.disabled = false;
+        sendBtn.disabled = false;
+        sendBtn.innerHTML = '<i class="fas fa-paper-plane"></i><span>寄出</span>';
+    }
+}
+
+/**
+ * 生成角色对用户回信的回复
+ * @param {string} characterId - 角色ID
+ * @param {string} letterId - 信件ID
+ */
+async function generateCharacterLetterReply(characterId, letterId) {
+    const letter = mailData[characterId]?.find(l => l.id === letterId);
+    if (!letter) return;
+    
+    const character = characters.find(c => c.id === characterId);
+    if (!character) return;
+    
+    // 显示生成中的提示
+    showMessageBox(`${character.name}正在提笔回信...`);
+    
+    // 收集上下文信息
+    const context = gatherAIContext(characterId);
+    const diaryContext = (character.diaries || []).slice(-5).map(d => 
+        `[日期: ${new Date(d.timestamp).toLocaleDateString()}] ${d.content}`
+    ).join('\n---\n');
+    
+    // 构建信件往来历史
+    let letterHistory = `[原始信件]\n标题: ${letter.title}\n内容: ${letter.content}\n\n`;
+    if (letter.replies && letter.replies.length > 0) {
+        letterHistory += '[往来回复]\n';
+        letter.replies.forEach((reply, index) => {
+            const sender = reply.sender === 'user' ? '你（用户）' : `我（${character.name}）`;
+            letterHistory += `${sender}: ${reply.content}\n\n`;
+        });
+    }
+    
+    const systemPrompt = `
+# 角色与任务
+你将完全扮演【${character.name}】，你的详细人设是：${character.persona}。
+你现在需要对用户的回信写一封回复。用户的身份设定是：${character.myPersona}。
+
+# 核心规则
+1. **回信性质**: 这是对用户回信的回复，不是独立的新信件。你需要针对用户最后一封回信的内容做出回应。
+2. **对话延续**: 仔细阅读下方的[信件往来历史]，你的回复应该自然延续这个对话，回应用户提到的话题、问题或情感。
+3. **人设一致**: 你的语气、用词和思考方式必须完全符合你的角色设定。
+4. **情感真实**: 根据用户的回信内容，表达真实的情感反应，可以是开心、惊讶、感动、思考等等。
+5. **内容来源**: 适当地结合[上下文信息]中的细节，让回信显得更加真实和有深度。
+6. **文笔优美**: 信件的语言应该优美、有文学性，但又要符合你的角色特点。
+7. **称呼天条**: 根据你们的关系称呼用户，绝对不要使用占位符如 {{user}} 或 [用户名]。
+8. **篇幅适中**: 回信正文应在200-400字之间，不要过短也不要过长。
+9. **JSON输出**: 你的最终输出必须是一个单一、完整的JSON对象，格式如下，前后不能有任何多余的文字。
+
+# JSON输出格式 (严格遵守)
+\`\`\`json
+{
+  "content": "回信的完整内容，使用 \\n 来表示换行。应该包含称呼、正文和落款。"
+}
+\`\`\`
+
+# 信件往来历史
+---
+${letterHistory}
+---
+
+# 上下文信息 (你的记忆和灵感来源)
+---
+[世界书设定]: ${context.worldBookContext}
+---
+[近期的聊天记录]: 
+${context.chatHistory.map(m => `${m.sender === 'user' ? '用户' : character.name}: ${m.content}`).join('\n')}
+---
+[你的日记回顾]:
+${diaryContext}
+---
+[共同的记忆胶囊]:
+${context.memoryContext}
+---
+[群聊记忆]:
+${context.groupChatContext}
+---
+    `;
+    
+    try {
+        const aiResponse = await callAI(systemPrompt, "现在，请基于以上信息，特别是用户最后一封回信的内容，写一封回信。");
+        
+        if (aiResponse) {
+            // 尝试从AI返回的内容中提取JSON部分
+            const jsonMatch = aiResponse.match(/\{\s*"[\s\S]*\}/);
+            if (!jsonMatch) throw new Error("AI返回的不是有效的JSON格式。");
+            
+            const replyData = JSON.parse(jsonMatch[0]);
+            
+            const characterReply = {
+                sender: 'character',
+                content: replyData.content,
+                timestamp: Date.now()
+            };
+            
+            letter.replies.push(characterReply);
+            saveData('mailData', mailData);
+            
+            // 重新渲染信件详情以显示角色的回复
+            viewLetter(characterId, letterId);
+            
+            showMessageBox(`收到了${character.name}的回信！`);
+            
+        } else {
+            showMessageBox(`${character.name}似乎还在思考该如何回复...`);
+        }
+    } catch (e) {
+        console.error("生成角色回复失败:", e);
+        showMessageBox("角色回信生成失败，请稍后重试。");
     }
 }
 
