@@ -12720,6 +12720,180 @@
         .letter-reply-time {
             font-size: 0.75rem;
             color: #999;
+            margin-top: 0.5rem;
+            text-align: right;
+        }
+        
+        /* 【【新增】】信件回复操作按钮样式 */
+        .letter-reply-actions {
+            display: flex;
+            gap: 0.5rem;
+            opacity: 0.5;
+            transition: opacity 0.2s ease;
+        }
+        
+        .letter-reply-item:hover .letter-reply-actions {
+            opacity: 1;
+        }
+        
+        .letter-reply-action-btn {
+            background: transparent;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            padding: 0.25rem 0.4rem;
+            border-radius: 0.25rem;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .letter-reply-action-btn:hover {
+            background: rgba(0, 0, 0, 0.1);
+            transform: scale(1.1);
+        }
+        
+        .dark-mode .letter-reply-action-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .letter-reply-action-btn.edit-btn:hover {
+            color: #3b82f6;
+        }
+        
+        .letter-reply-action-btn.delete-btn:hover {
+            color: #ef4444;
+        }
+        
+        /* 【【新增】】信件回复编辑界面样式 */
+        .letter-reply-edit-input {
+            width: 100%;
+            min-height: 100px;
+            padding: 0.5rem;
+            border: 2px solid #3b82f6;
+            border-radius: 0.5rem;
+            background: rgba(255, 255, 255, 0.9);
+            font-family: inherit;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            resize: vertical;
+            box-sizing: border-box;
+        }
+        
+        .dark-mode .letter-reply-edit-input {
+            background: rgba(30, 30, 30, 0.95);
+            color: #e5e5e5;
+            border-color: #60a5fa;
+        }
+        
+        .letter-reply-edit-actions {
+            margin-top: 0.5rem;
+            display: flex;
+            gap: 0.5rem;
+            justify-content: flex-end;
+        }
+        
+        .letter-reply-edit-save-btn,
+        .letter-reply-edit-cancel-btn {
+            padding: 0.4rem 1rem;
+            border: none;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            color: white;
+        }
+        
+        .letter-reply-edit-save-btn {
+            background: #3b82f6;
+        }
+        
+        .letter-reply-edit-save-btn:hover {
+            background: #2563eb;
+        }
+        
+        .letter-reply-edit-cancel-btn {
+            background: #6b7280;
+        }
+        
+        .letter-reply-edit-cancel-btn:hover {
+            background: #4b5563;
+        }
+        
+        /* 【【新增】】手机端优化 */
+        @media (max-width: 768px) {
+            /* 手机端始终显示按钮，不需要hover */
+            .letter-reply-actions {
+                opacity: 0.7;
+                gap: 0.3rem;
+            }
+            
+            /* 增大按钮触摸区域 */
+            .letter-reply-action-btn {
+                padding: 0.5rem 0.6rem;
+                font-size: 0.9rem;
+                min-width: 36px;
+                min-height: 36px;
+                touch-action: manipulation;
+            }
+            
+            /* 手机端点击反馈 */
+            .letter-reply-action-btn:active {
+                background: rgba(0, 0, 0, 0.15);
+                transform: scale(0.95);
+            }
+            
+            .dark-mode .letter-reply-action-btn:active {
+                background: rgba(255, 255, 255, 0.15);
+            }
+            
+            .letter-reply-action-btn.edit-btn:active {
+                color: #3b82f6;
+                background: rgba(59, 130, 246, 0.1);
+            }
+            
+            .letter-reply-action-btn.delete-btn:active {
+                color: #ef4444;
+                background: rgba(239, 68, 68, 0.1);
+            }
+            
+            /* 手机端编辑界面优化 */
+            .letter-reply-edit-input {
+                font-size: 1rem; /* 防止iOS自动缩放 */
+                min-height: 120px;
+                padding: 0.75rem;
+            }
+            
+            .letter-reply-edit-actions {
+                gap: 0.75rem;
+                margin-top: 0.75rem;
+            }
+            
+            .letter-reply-edit-save-btn,
+            .letter-reply-edit-cancel-btn {
+                flex: 1;
+                padding: 0.75rem 1rem;
+                font-size: 0.95rem;
+                min-height: 44px;
+                justify-content: center;
+                touch-action: manipulation;
+            }
+            
+            /* 手机端按钮点击反馈 */
+            .letter-reply-edit-save-btn:active {
+                background: #1d4ed8;
+                transform: scale(0.98);
+            }
+            
+            .letter-reply-edit-cancel-btn:active {
+                background: #374151;
+                transform: scale(0.98);
+            }
         }
         
         .letter-reply-content {
@@ -16122,10 +16296,15 @@
             <div id="letter-view-screen" class="app-screen-view flex-col hidden">
                 <div class="app-header">
                     <button id="letter-view-back-button" class="app-header-btn"><i class="fas fa-chevron-left"></i></button>
-                    <h3 class="app-header-title">Read Letters</h3>
-                    <button id="letter-delete-button" class="app-header-btn text-red-500 hover:text-red-600 transition-colors" title="删除信件">
-                        <i class="fas fa-trash"></i>
-                    </button>
+                    <h3 class="app-header-title" style="margin-left: 25px;">Read Letters</h3>
+                    <div style="display: flex; gap: 8px;">
+                        <button id="letter-edit-button" class="app-header-btn text-blue-500 hover:text-blue-600 transition-colors" title="编辑信件">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button id="letter-delete-button" class="app-header-btn text-red-500 hover:text-red-600 transition-colors" title="删除信件">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
                 </div>
                 <div id="letter-view-content-wrapper" class="flex-1 overflow-y-auto p-4">
                     <div id="letter-view-content" class="letter-paper p-6 rounded-lg shadow-lg">
@@ -37143,6 +37322,18 @@ function addNewEventListeners() {
                 .filter(msg => msg.type === 'text' && msg.sender !== 'system' && !msg.content.startsWith('['))
                 .slice(-2);
 
+            // 【【新增】】获取该角色的信件内容
+            const characterLetters = (mailData[characterId] || [])
+                .sort((a, b) => b.timestamp - a.timestamp)
+                .slice(0, 3); // 取最近3封信件
+            
+            // 【【新增】】获取该角色相关的记忆胶囊内容
+            const allMemories = loadData('memoryCapsules', []);
+            const characterMemories = allMemories
+                .filter(m => m.characterId === characterId)
+                .sort((a, b) => b.createdAt - a.createdAt)
+                .slice(0, 3); // 取最近3条记忆
+
             let charLocation = "虚拟定位...";
             let memoItems = [];
             
@@ -37156,12 +37347,29 @@ function addNewEventListeners() {
                 }
 
                 const userName = loadData('perch_username') || '你';
+                
+                // 【【新增】】构建信件上下文
+                let lettersContext = '无';
+                if (characterLetters.length > 0) {
+                    lettersContext = characterLetters.map(letter => 
+                        `标题: ${letter.title}\n内容: ${letter.content.substring(0, 100)}...`
+                    ).join('\n---\n');
+                }
+                
+                // 【【新增】】构建记忆胶囊上下文
+                let memoriesContext = '无';
+                if (characterMemories.length > 0) {
+                    memoriesContext = characterMemories.map(memory => 
+                        `标题: ${memory.title}\n内容: ${memory.content.substring(0, 100)}...\n你的感触: ${memory.characterFeeling || '未记录'}`
+                    ).join('\n---\n');
+                }
+                
                 const memoPrompt = `
 身份
 你将扮演角色 ${character.name} (人设: ${character.persona})。
 
 任务
-根据你和 ${userName} (我们的关系: ${character.myPersona}) 的[最近互动参考]，生成两项数据：
+根据你和 ${userName} (我们的关系: ${character.myPersona}) 的以下所有参考信息，生成两项数据：
 1. location: 一个符合你人设和近期事件的、简短的"当前虚拟位置"（必须控制在7个字以内，包括标点符号）。
 2. memo: 3 条你写在手机备忘录里的、想要为对方做的事情（每条控制在16字左右）。
 
@@ -37179,6 +37387,12 @@ function addNewEventListeners() {
 
 最近互动参考
 ${recentMessages.map(m => `${m.sender === 'user' ? userName : character.name}: ${m.content}`).join('\n')}
+
+我们之间的信件
+${lettersContext}
+
+我们共同的记忆胶囊
+${memoriesContext}
 `;
 
                 const aiMemoResponse = await callAI(memoPrompt, "生成位置和备忘录");
@@ -37740,6 +37954,13 @@ ${recentMessages.map(m => `${m.sender === 'user' ? userName : character.name}: $
                     openLetterList(currentMailCharacterId);
                 } else {
                     showScreen('mail-list-screen');
+                }
+            });
+
+            // 编辑信件按钮事件监听器
+            $('#letter-edit-button').addEventListener('click', () => {
+                if (currentMailCharacterId && currentLetterId) {
+                    editMainLetter(currentMailCharacterId, currentLetterId);
                 }
             });
 
@@ -46174,17 +46395,25 @@ function viewLetter(characterId, letterId) {
         repliesHTML = `
             <div class="letter-replies-section">
                 <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 1.5rem; color: #999;"><i class="fas fa-envelope-open-text" style="margin-right: 0.5rem;"></i>来往信件</h3>
-                ${letter.replies.map(reply => {
+                ${letter.replies.map((reply, index) => {
                     const isUser = reply.sender === 'user';
                     const senderName = isUser ? perchUsername : characterName;
                     const replyClass = isUser ? 'user-reply' : 'character-reply';
                     return `
-                        <div class="letter-reply-item ${replyClass}">
+                        <div class="letter-reply-item ${replyClass}" data-reply-index="${index}">
                             <div class="letter-reply-header">
                                 <span class="letter-reply-sender">${senderName}</span>
-                                <span class="letter-reply-time">${new Date(reply.timestamp).toLocaleString()}</span>
+                                <div class="letter-reply-actions">
+                                    <button class="letter-reply-action-btn edit-btn" onclick="editLetterReply('${characterId}', '${letterId}', ${index})" title="编辑">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="letter-reply-action-btn delete-btn" onclick="deleteLetterReply('${characterId}', '${letterId}', ${index})" title="删除">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
                             </div>
-                            <div class="letter-reply-content">${reply.content.replace(/\n/g, '<br>')}</div>
+                            <div class="letter-reply-content" data-reply-index="${index}">${reply.content.replace(/\n/g, '<br>')}</div>
+                            <div class="letter-reply-time">${new Date(reply.timestamp).toLocaleString()}</div>
                         </div>
                     `;
                 }).join('')}
@@ -46207,7 +46436,7 @@ function viewLetter(characterId, letterId) {
                 placeholder="在这里写下你的回信..."></textarea>
             <button id="send-letter-reply-btn" class="letter-reply-btn">
                 <i class="fas fa-paper-plane"></i>
-                <span>寄出</span>
+                <span>Send Reply</span>
             </button>
         </div>
     `;
@@ -46229,6 +46458,91 @@ function viewLetter(characterId, letterId) {
     replyInput.addEventListener('keydown', (e) => {
         if (e.ctrlKey && e.key === 'Enter') {
             sendLetterReply(characterId, letterId);
+        }
+    });
+}
+
+/**
+ * 编辑主信件的标题和内容
+ * @param {string} characterId - 角色ID
+ * @param {string} letterId - 信件ID
+ */
+function editMainLetter(characterId, letterId) {
+    const letter = mailData[characterId]?.find(l => l.id === letterId);
+    if (!letter) return;
+
+    // 创建编辑弹窗
+    const modal = document.createElement('div');
+    modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+    modal.innerHTML = `
+        <div class="bg-gray-800 rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-white">编辑信件</h3>
+                <button id="close-edit-letter-modal" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">信件标题</label>
+                    <input type="text" id="edit-letter-title" class="w-full bg-gray-700 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" value="${letter.title.replace(/"/g, '&quot;')}" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">信件内容</label>
+                    <textarea id="edit-letter-content" rows="12" class="w-full bg-gray-700 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none">${letter.content}</textarea>
+                </div>
+                <div class="flex justify-end gap-3 mt-6">
+                    <button id="cancel-edit-letter" class="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-500 transition-colors">取消</button>
+                    <button id="save-edit-letter" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500 transition-colors">保存</button>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+
+    // 关闭按钮
+    modal.querySelector('#close-edit-letter-modal').addEventListener('click', () => {
+        modal.remove();
+    });
+
+    // 取消按钮
+    modal.querySelector('#cancel-edit-letter').addEventListener('click', () => {
+        modal.remove();
+    });
+
+    // 保存按钮
+    modal.querySelector('#save-edit-letter').addEventListener('click', () => {
+        const newTitle = modal.querySelector('#edit-letter-title').value.trim();
+        const newContent = modal.querySelector('#edit-letter-content').value.trim();
+
+        if (!newTitle) {
+            showMessageBox('请输入信件标题');
+            return;
+        }
+
+        if (!newContent) {
+            showMessageBox('请输入信件内容');
+            return;
+        }
+
+        // 更新信件
+        letter.title = newTitle;
+        letter.content = newContent;
+
+        // 保存数据
+        saveData('mailData', mailData);
+
+        // 刷新信件显示
+        viewLetter(characterId, letterId);
+
+        // 关闭弹窗
+        modal.remove();
+
+        showMessageBox('信件已更新');
+    });
+
+    // 点击背景关闭
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.remove();
         }
     });
 }
@@ -46259,6 +46573,118 @@ function deleteLetter(characterId, letterId) {
     // 清空当前信件信息
     currentMailCharacterId = null;
     currentLetterId = null;
+}
+
+/**
+ * 【【新增】】删除指定的信件回复
+ * @param {string} characterId - 角色ID
+ * @param {string} letterId - 信件ID
+ * @param {number} replyIndex - 回复索引
+ */
+function deleteLetterReply(characterId, letterId, replyIndex) {
+    const letter = mailData[characterId]?.find(l => l.id === letterId);
+    if (!letter || !letter.replies) return;
+    
+    // 确认删除
+    if (!confirm('确定要删除这条回信吗？')) return;
+    
+    // 删除指定索引的回复
+    letter.replies.splice(replyIndex, 1);
+    
+    // 保存数据
+    saveData('mailData', mailData);
+    
+    // 重新渲染信件详情
+    viewLetter(characterId, letterId);
+    
+    // 显示删除成功消息
+    showMessageBox("回信已删除");
+}
+
+/**
+ * 【【新增】】编辑指定的信件回复
+ * @param {string} characterId - 角色ID
+ * @param {string} letterId - 信件ID
+ * @param {number} replyIndex - 回复索引
+ */
+function editLetterReply(characterId, letterId, replyIndex) {
+    const letter = mailData[characterId]?.find(l => l.id === letterId);
+    if (!letter || !letter.replies || !letter.replies[replyIndex]) return;
+    
+    const reply = letter.replies[replyIndex];
+    
+    // 获取回复内容元素
+    const replyContentElement = document.querySelector(`.letter-reply-content[data-reply-index="${replyIndex}"]`);
+    if (!replyContentElement) return;
+    
+    // 保存原始内容
+    const originalContent = reply.content;
+    
+    // 将内容区域替换为可编辑的textarea
+    const currentHTML = replyContentElement.innerHTML;
+    const currentText = reply.content;
+    
+    replyContentElement.innerHTML = `
+        <textarea class="letter-reply-edit-input">${currentText}</textarea>
+        <div class="letter-reply-edit-actions">
+            <button class="letter-reply-edit-save-btn">
+                <i class="fas fa-check"></i>
+                <span>保存</span>
+            </button>
+            <button class="letter-reply-edit-cancel-btn">
+                <i class="fas fa-times"></i>
+                <span>取消</span>
+            </button>
+        </div>
+    `;
+    
+    // 获取新创建的元素
+    const textarea = replyContentElement.querySelector('.letter-reply-edit-input');
+    const saveBtn = replyContentElement.querySelector('.letter-reply-edit-save-btn');
+    const cancelBtn = replyContentElement.querySelector('.letter-reply-edit-cancel-btn');
+    
+    // 聚焦并选中文本
+    textarea.focus();
+    textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+    
+    // 保存按钮事件
+    saveBtn.addEventListener('click', () => {
+        const newContent = textarea.value.trim();
+        if (!newContent) {
+            showMessageBox("回信内容不能为空！");
+            return;
+        }
+        
+        // 更新回复内容
+        reply.content = newContent;
+        reply.timestamp = Date.now(); // 更新时间戳
+        
+        // 保存数据
+        saveData('mailData', mailData);
+        
+        // 重新渲染信件详情
+        viewLetter(characterId, letterId);
+        
+        // 显示成功消息
+        showMessageBox("回信已更新");
+    });
+    
+    // 取消按钮事件
+    cancelBtn.addEventListener('click', () => {
+        // 恢复原始显示
+        viewLetter(characterId, letterId);
+    });
+    
+    // 支持 Ctrl+Enter 保存
+    textarea.addEventListener('keydown', (e) => {
+        if (e.ctrlKey && e.key === 'Enter') {
+            saveBtn.click();
+        }
+        // Esc 取消
+        if (e.key === 'Escape') {
+            cancelBtn.click();
+        }
+    });
 }
 
 /**
@@ -46385,7 +46811,7 @@ async function sendLetterReply(characterId, letterId) {
     // 禁用输入框和按钮
     replyInput.disabled = true;
     sendBtn.disabled = true;
-    sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>寄出中...</span>';
+    sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Sending...</span>';
     
     try {
         // 添加用户回复
@@ -46421,7 +46847,7 @@ async function sendLetterReply(characterId, letterId) {
         // 恢复输入框和按钮
         replyInput.disabled = false;
         sendBtn.disabled = false;
-        sendBtn.innerHTML = '<i class="fas fa-paper-plane"></i><span>寄出</span>';
+        sendBtn.innerHTML = '<i class="fas fa-paper-plane"></i><span>Send Reply</span>';
     }
 }
 
