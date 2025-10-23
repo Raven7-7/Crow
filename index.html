@@ -6,6 +6,7 @@
     <title>RavenPhone</title>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <link rel="apple-touch-icon" href="https://tc-new.z.wiki/autoupload/f/fRcoPlzpthEzwh0RrI62JbKXl_QqVl-bpSwqP4fJO68/20250825/5nvZ/1280X1280/3d8950a849829447f24466a851153f8f.jpg/webp">
+    <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiUmF2ZW5QaG9uZSIsInNob3J0X25hbWUiOiJSYXZlblBob25lIiwic3RhcnRfdXJsIjoiLiIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwiYmFja2dyb3VuZF9jb2xvciI6IiMwMDAwMDAiLCJ0aGVtZV9jb2xvciI6IiMwMDAwMDAiLCJpY29ucyI6W3sic3JjIjoiaHR0cHM6Ly90Yy1uZXcuei53aWtpL2F1dG91cGxvYWQvZi9mUmNvUGx6cHRoRXp3aDBSckk2M0piS1hsX1FxVmwtYnBTd3FQNGRKTzY4LzIwMjUwODI1LzVudloLzEyODBIMTI4MC8zZDg5NTA5ODQ5ODI5NDQ3ZjI0NDY2YTg1MTE1M2Y4Zi5qcGcvd2VicCIsInNpemVzIjoiMTkyeDE5MiIsInR5cGUiOiJpbWFnZS93ZWJwIn0seyJzcmMiOiJodHRwczovL3RjLW5ldy56Lndpa2kvYXV0b3VwbG9hZC9mL2ZSY29QbHpwdGhFendrMFJySTYySmJLWGxfUXFWbC1icFN3cVA0ZkpPNjgvMjAyNTA4MjUvNW52Wi8xMjgwWDEyODAvM2Q4OTUwYTg0OTgyOTQ0N2YyNDQ2NmE4NTExNTNmOGYuanBnL3dlYnAiLCJzaXplcyI6IjUxMng1MTIiLCJ0eXBlIjoiaW1hZ2Uvd2VicCJ9XX0=">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -26217,7 +26218,7 @@ ${chatHistory.map(m => `${m.sender === 'user' ? '对方' : '我'}: ${m.content}`
         let isGeneratingDiary = false;
         
         /**
-         * 【【新增】】强制为指定角色生成一篇日记
+         * 【【新增 V2.0 修复版】】强制为指定角色生成一篇日记
          */
         async function forceGenerateDiary() {
             const characterId = document.getElementById('force-diary-character-select').value;
@@ -26235,34 +26236,48 @@ ${chatHistory.map(m => `${m.sender === 'user' ? '对方' : '我'}: ${m.content}`
             showMessageBox(`正在强制为 ${character.name} 生成日记，请稍候...`);
 
             try {
-                // 1. 直接使用"智能上下文"获取最佳写作素材，绕过所有门槛
-                const smartContext = await getSmartDiaryContext(characterId);
-                if (!smartContext || smartContext.length === 0) {
-                    showMessageBox("强制生成失败：最近的聊天内容不足以提炼出有价值的素材。");
+                // --- 【【【【【核心修复 START】】】】】 ---
+                // "强制生成"不应该检查情感或是否"已使用"，它应该直接获取最新的聊天记录。
+                
+                const chatHistory = chatHistories[characterId]?.history || [];
+                
+                // 1. 直接获取所有非系统消息，不过滤 usedForDiary
+                const allMessages = chatHistory.filter(msg => 
+                    msg.type !== 'system-internal' && 
+                    msg.type !== 'system-memory' && 
+                    msg.sender !== 'system'
+                );
+
+                if (allMessages.length === 0) {
+                    showMessageBox("强制生成失败：该角色没有任何聊天记录。");
                     return;
                 }
 
+                // 2. 取最近的 10 条消息作为上下文
+                const smartContext = allMessages.slice(-10);
+                // --- 【【【【【核心修复 END】】】】】 ---
+
                 console.log(`[强制生成] 已为 ${character.name} 找到写作素材，共 ${smartContext.length} 条消息。`);
 
-                // 2. 打包素材
+                // 3. 打包素材
                 const diaryContextForAI = {
                     character: { name: character.name, persona: character.persona, myPersona: character.myPersona },
                     recentChat: smartContext,
-                    recentMoments: (character.moments || []).slice(-3),
-                    recentDiaries: (character.diaries || []).slice(-3),
+                    recentMoments: (character.diaries || []).slice(-3).map(d => d.content), // V34.0 修复：从 diaries 读取
+                    recentDiaries: (character.diaries || []).slice(-3).map(d => d.content), // V34.0 修复：从 diaries 读取
                     worldBook: getCharacterWorldContext(character)
                 };
 
-                // 3. 调用AI生成日记
+                // 4. 调用AI生成日记
                 const aiDiary = await generateAIDiary(characterId, diaryContextForAI);
 
-                // 4. 保存并更新
+                // 5. 保存并更新
                 if (aiDiary) {
                     if (!character.diaries) character.diaries = [];
                     character.diaries.push(aiDiary);
-                    saveData('characters', characters);
+                    saveData('characters', characters); // V34.0 修复：保存到 characters 数组
 
-                    // 同样标记消息为"已使用"，避免影响下一次正常的自动触发
+                    // 标记这些消息"已使用"，防止自动触发时重复写
                     smartContext.forEach(msg => {
                         const historyMsg = chatHistories[characterId]?.history.find(h => h.timestamp === msg.timestamp);
                         if (historyMsg) historyMsg.usedForDiary = true;
@@ -48317,6 +48332,17 @@ ${wordGuessState.isFirstClue ?
         console.log('showCharacterPhoneConfirm("确认", "你确定要执行此操作吗？", () => console.log("已确认"));');
         // ====== 角色手机弹窗创建辅助函数 END ======
 
+    </script>
+
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+          const swCode = "self.addEventListener('fetch',%20e%20=%3E%20e.respondWith(fetch(e.request)));";
+          navigator.serviceWorker.register("data:application/javascript," + swCode)
+            .then(function(registration) { console.log('内联 ServiceWorker 注册成功:', registration.scope); })
+            .catch(function(err) { console.log('内联 ServiceWorker 注册失败:', err); });
+        });
+      }
     </script>
 
         </body>
