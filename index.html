@@ -12473,17 +12473,38 @@
         }
 
 
-        /* 4. 页面指示器 (小圆点) 样式 */
+        /* 4. 页面指示器 (小圆点) 样式 - 【【修复遮挡问题】】 */
         #home-screen-dots {
             position: absolute;
-            bottom: 80px; /* 移到dock栏上方 */
+            
+            /* 【【核心修复 bottom】】
+             * Dock栏高度 4.5rem (72px) + Dock栏底部 1rem (16px) = 5.5rem (88px)
+             * 我们将圆点放在 Dock 栏顶部 (88px) 之上，再加 0.25rem (4px) 的间距
+             * 88px + 4px = 92px (或 5.75rem)
+             */
+            bottom: 5.75rem !important; /* 92px, 使用 !important 覆盖 tailwind (bottom-20) */
+
             left: 50%;
             transform: translateX(-50%);
             display: flex;
             gap: 8px;
-            padding: 20px;
-            z-index: 10;
-            pointer-events: none; /* 让小圆点不阻挡下方的触摸滑动 */
+            
+            /* 【【核心修复 padding】】
+             * HTML中的Tailwind类是 p-4 (1rem/16px)，而CSS中是 20px。
+             * 我们统一使用 16px (1rem)。
+             */
+            padding: 1rem !important; /* 16px, 使用 !important 覆盖 CSS (20px) */
+            
+            z-index: 10; /* 这个 z-index (10) 必须高于 main-dock (auto/0) */
+            pointer-events: none;
+        }
+
+        /* 【【新增】】全屏模式下，圆点的位置必须考虑安全区域 */
+        .fullscreen-active #home-screen-dots {
+            /* * 基础位置 5.75rem (92px)
+             * 加上安全区域的高度
+             */
+            bottom: calc(5.75rem + env(safe-area-inset-bottom)) !important;
         }
         .page-dot {
             width: 6px;
